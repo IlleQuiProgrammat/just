@@ -1,0 +1,8 @@
+[Bb]in/
+[Oo]bj/
+*.dll
+*.exe
+/packages/
+riderModule.iml
+/_ReSharper.Caches/
+.vs/
