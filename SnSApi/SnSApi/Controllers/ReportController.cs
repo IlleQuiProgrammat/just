@@ -114,6 +114,9 @@ namespace SnSApi.Controllers
                 ReportStatus = ReportStatus.Unresolved,
                 Title = report.Title,
                 ResponseContent = report.ResponseContent,
+                StudentPublicKey = report.StudentPublicKey,
+                StudentPrivateKey = report.StudentPrivateKey,
+                IV = report.IV,
                 SchoolRead = false,
                 StudentRead = true,
             });
@@ -122,7 +125,7 @@ namespace SnSApi.Controllers
         }
 
         [HttpPost("{id}")]
-        public async Task<IActionResult> SendMessage(int id, [FromBody] string messageContent)
+        public async Task<IActionResult> SendMessage(int id, [FromBody] MessageCreationDto message)
         {
             var user = await _userManager.GetUserAsync(HttpContext.User);
             
@@ -145,7 +148,8 @@ namespace SnSApi.Controllers
                     SenderId = user.Id,
                     SentTime = DateTime.Now,
                     Type = MessageType.Text,
-                    Contents = messageContent
+                    Contents = message.Contents,
+                    IV = message.IV
                 });
                 
                 await _context.SaveChangesAsync();
@@ -171,7 +175,8 @@ namespace SnSApi.Controllers
                     SenderId = user.Id,
                     SentTime = DateTime.Now,
                     Type = MessageType.Text,
-                    Contents = messageContent
+                    Contents = message.Contents,
+                    IV = message.IV
                 });
 
                 await _context.SaveChangesAsync();

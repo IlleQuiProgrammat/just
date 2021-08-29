@@ -36,7 +36,7 @@ const Register = ({ history }) => {
   return (
     <>
       <h1>Register</h1>
-      <ErrorAlert apiResult={registerResult} extractErrors={errors => errors.map(code => code.description)} />
+      <ErrorAlert apiResult={registerResult} extractErrors={errors => errors?.map(code => code.description)} />
       <TextField
         className={classes.input}
         label="Email"

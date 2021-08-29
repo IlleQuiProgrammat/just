@@ -1,11 +1,11 @@
 import React from 'react';
 import { makeStyles, TableContainer, Paper, Table, TableHead, TableRow, TableCell, TableBody, TextField, Button, CircularProgress, Fade, Checkbox } from '@material-ui/core';
 import { Link, Redirect } from 'react-router-dom';
-import { useDemoteUserMutation, useGetSchoolUsersQuery, useGetSchoolSettingsQuery, usePromoteUserMutation } from './services/school';
+import { useGetSchoolUsersQuery, useGetSchoolSettingsQuery, usePromoteUserMutation, useDemoteUserMutation } from './services/school';
 import ErrorAlert from './components/ErrorAlert';
 import { Alert } from '@material-ui/lab';
 import { useGetAllShortQuestionsQuery, useSetQuestionActivityMutation } from './services/questions';
-import { useGetSignInStatusQuery } from './services/auth';
+import { useGetKeysQuery, useGetSignInStatusQuery } from './services/auth';
 
 const useStyles = makeStyles(theme => ({
   tf: {
@@ -18,8 +18,9 @@ const useStyles = makeStyles(theme => ({
 const Settings = () => {
   const classes = useStyles();
   const signInStatus = useGetSignInStatusQuery();
-  const [demoteUser, demoteUserResponse] = useDemoteUserMutation();
+  const { data: keys } = useGetKeysQuery();
   const [promoteUser, promoteUserRepsonse] = usePromoteUserMutation();
+  const [demoteUser, demoteUserResponse] = useDemoteUserMutation();
   const [setQuestionActivity, setQuestionActivityResponse] = useSetQuestionActivityMutation();
   const userRequest = useGetSchoolUsersQuery();
   const settingsRequest = useGetSchoolSettingsQuery();
@@ -128,6 +129,11 @@ const Settings = () => {
         </Button>
       </TableContainer>
       <h1>Users</h1>
+      <Alert severity="warning">
+        Although demotion removes the user&rsquo;s ability to view reports and users, they could
+        theoretically retain the private key shared with them during promotion which could be used
+        if unfettered access to the database is obtained. Therefore, take caution promoting users.
+      </Alert>
       <h2>Staff</h2>
       <TableContainer component={Paper}>
         <Table>
@@ -145,8 +151,12 @@ const Settings = () => {
                 <TableRow key={user.id}>
                   <TableCell>{user.email}</TableCell>
                   <TableCell>
-                    <Button variant="text" color="primary" onClick={() => demoteUser(user.id)}>
-                      Demote from Staff
+                    <Button
+                    variant="text"
+                    color="primary"
+                    onClick={() => demoteUser(user.id)}
+                    >
+                      Demote From Staff
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -172,7 +182,12 @@ const Settings = () => {
                 <TableRow key={user.id}>
                   <TableCell>{user.email}</TableCell>
                   <TableCell>
-                    <Button variant="text" color="primary" onClick={() => promoteUser(user.id)}>
+                    <Button variant="text" color="primary" onClick={() => promoteUser(
+                      {
+                        userId: user.id,
+                        encodedUserPublicKey: user.publicKey,
+                        schoolPrivateKey: keys.schoolPrivateKey
+                      })}>
                       Promote to Staff
                     </Button>
                   </TableCell>

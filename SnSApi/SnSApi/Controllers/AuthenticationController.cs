@@ -25,9 +25,20 @@ namespace SnSApi.Controllers
         }
 
         [HttpGet]
-        public IActionResult Get()
+        [Authorize]
+        public async Task<IActionResult> Get()
         {
-            return NoContent();
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            var school = await _context.Schools.FindAsync(user.SchoolId);
+            return Ok(new KeysDto
+            {
+                PrivateKey = user.PrivateKey,
+                PrivateKeyIV = user.IV,
+                PublicKey = user.PublicKey,
+                SchoolPublicKey = school.PublicKey,
+                SchoolPrivateKey = user.SchoolPrivateKey,
+                SchoolPrivateKeyIV = user.SchoolPrivateKeyIV
+            });
         }
 
         [HttpPost("login")]
@@ -74,23 +85,44 @@ namespace SnSApi.Controllers
                     }
                 });
             }
+
+            var userCnt = await _context.Users.CountAsync(x => x.SchoolId == school.SchoolId);
             
-            // TODO: Implement Student Limits
-            
-            var potentialUser = new User()
+            User potentialUser = new User()
             {
                 UserName = registrationForm.Email,
                 Email = registrationForm.Email,
                 // TODO: Enable email verification
                 EmailConfirmed = true,
                 SchoolId = school.SchoolId,
-                Role = DenormalisedRole.Student
+                Role = DenormalisedRole.Student,
+                PublicKey = registrationForm.PublicKey,
+                PrivateKey = registrationForm.PrivateKey,
+                SchoolPrivateKey = "",
+                IV = registrationForm.IV,
+                SchoolPrivateKeyIV = "",
             };
+
+            if (userCnt == 0)
+            {
+                potentialUser.SchoolPrivateKey = registrationForm.PotentialSchoolPrivateKey;
+                potentialUser.SchoolPrivateKeyIV = registrationForm.PotentialSchoolPrivateKeyIV;
+                potentialUser.Role = DenormalisedRole.SchoolAdmin;
+            }
             
             var result = await _userManager.CreateAsync(potentialUser, registrationForm.Password);
             if (result.Succeeded)
             {
-                await _userManager.AddToRoleAsync(potentialUser, "student");
+                if (userCnt == 0)
+                {
+                    school.PublicKey = registrationForm.PotentialSchoolPublicKey;
+                    await _context.SaveChangesAsync();
+                    await _userManager.AddToRoleAsync(potentialUser, "school_admin");
+                }
+                else
+                {
+                    await _userManager.AddToRoleAsync(potentialUser, "student");
+                }
                 return Ok();
             }
             

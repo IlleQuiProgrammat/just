@@ -26,13 +26,23 @@ namespace SnSApi.Models
         public DateTime OpenedDateTime { get; set; }
         public DateTime? ClosedDateTime { get; set; }
         public int QuestionId { get; set; }
+        // Encrypted with derived key
         public string Title { get; set; }
         [JsonIgnore]
         public virtual Question Question { get; set; }
+        
+        // Encrypted with derived key
         public string ResponseContent { get; set; }
+        public string IV { get; set; }
+        
         [JsonIgnore]
         public virtual List<ReportMessage> Messages { get; set; }
 
+        // Public key thing
+        public string StudentPublicKey { get; set; }
+        // Encrypted using form of student password
+        public string StudentPrivateKey { get; set; }
+        
         public bool StudentRead { get; set; }
         public bool SchoolRead { get; set; }
     }

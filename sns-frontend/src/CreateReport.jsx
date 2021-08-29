@@ -1,11 +1,12 @@
-import { Button, FormControl, InputLabel, MenuItem, Select, TextField } from '@material-ui/core';
+import { Button, FormControl, InputLabel, MenuItem, Select, TextField, FormHelperText, Grid } from '@material-ui/core';
 import { createStyles, makeStyles } from '@material-ui/core/styles';
+import { Warning } from '@material-ui/icons';
 import React, { useState } from 'react';
 import { useHistory, Redirect } from 'react-router-dom';
 import { useGetActiveShortQuestionsQuery, useGetQuestionByIdQuery } from './services/questions';
 import { useCreateReportMutation } from './services/report';
 import ErrorAlert from './components/ErrorAlert';
-import { useGetSignInStatusQuery } from './services/auth';
+import { useGetKeysQuery, useGetSignInStatusQuery } from './services/auth';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -80,6 +81,7 @@ const CreateReport = () => {
   const [createReport, createReportResult] = useCreateReportMutation();
   const [fieldData, setFieldData] = useState({});
   const [title, setTitle] = useState('');
+  const { data: keys } = useGetKeysQuery();
 
   if (signInStatus.data === "none") {
     return <Redirect to="/login" />
@@ -95,6 +97,15 @@ const CreateReport = () => {
           label="Report Title"
           onChange={ev => setTitle(ev.target.value)}
         />
+        <FormHelperText id="component-helper-text">
+          <Grid container alignItems="center">
+            <Warning fontSize="small" />
+            <div style={{ lineHeight: '24px' }}>
+              &nbsp;
+              This title is sent unencrypted.
+            </div>
+          </Grid>
+        </FormHelperText>
       </FormControl>
       <br />
       <FormControl variant="outlined" className={classes.formControl}>
@@ -149,7 +160,9 @@ const CreateReport = () => {
             title,
             responseContent: JSON.stringify(
               Object.keys(fieldData).map(key => ({ name: key, value: fieldData[key] }))
-            )
+            ),
+            schoolPublicKey: keys.schoolPublicKey,
+            symmetricEncryptionKey: keys.symmetricEncryptionKey,
           }).then(({ data, error }) => {
             if (!error) history.push('/my_reports')
           })

@@ -8,7 +8,7 @@ import { getStatusFromNumber } from './utils';
 import { useChangeReportStatusMutation, useGetReportByIdQuery, useSendMessageMutation } from './services/report';
 import ErrorAlert from './components/ErrorAlert';
 import { useParams, Redirect } from 'react-router-dom';
-import { useGetSignInStatusQuery } from './services/auth';
+import { useGetKeysQuery, useGetSignInStatusQuery } from './services/auth';
 
 const useStyles = makeStyles(theme => ({
   chips: {
@@ -65,11 +65,18 @@ const ViewReport = () => {
   const classes = useStyles();
   const { reportId } = useParams();
   const signInStatus = useGetSignInStatusQuery();
-  const fullReportRequest = useGetReportByIdQuery(reportId, {
-    pollingInterval: 60 * 1000,
+  const { data: keys } = useGetKeysQuery();
+  const fullReportRequest = useGetReportByIdQuery({
+    reportId,
+    isSchool: signInStatus.data !== "student",
+    schoolPublicKey: keys?.schoolPublicKey,
+    schoolPrivateKey: keys?.schoolPrivateKey,
+  }, {
+    pollingInterval: 5 * 60 * 1000,
     forceRefetch: true
   });
   const { data: fullReportC, isLoading, isFetching } = fullReportRequest;
+  const { data: userStatus } = useGetSignInStatusQuery();
   let fullReport;
   if (fullReportC)
     fullReport = {
@@ -228,10 +235,18 @@ const ViewReport = () => {
               variant="contained"
               color="primary"
               onClick={() => {
-                sendMessage({ id: fullReport.reportId, messageContent })
-                  .then(({ error }) => {
-                    if (!error) setMessageContent('');
-                  })
+                sendMessage({
+                  reportId: fullReport.reportId,
+                  messageContent,
+                  schoolPublicKey: keys.schoolPublicKey,
+                  schoolPrivateKey: keys.schoolPrivateKey,
+                  studentPublicKey: fullReport.studentPublicKey,
+                  studentPrivateKey: fullReport.studentPrivateKey,
+                  isSchool: userStatus !== "student"
+                })
+                .then(({ error }) => {
+                  if (!error) setMessageContent('');
+                })
               }}
               disabled={messageContent.length === 0 || fullReport.reportStatus !== 0}
             >

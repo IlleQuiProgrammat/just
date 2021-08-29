@@ -9,5 +9,8 @@ namespace SnSApi.Models.Dto
         public int QuestionId { get; set; }
         public string Title { get; set; }
         public string ResponseContent { get; set; }
+        public string StudentPublicKey { get; set; }
+        public string StudentPrivateKey { get; set; }
+        public string IV { get; set; }
     }
 }

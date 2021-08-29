@@ -29,6 +29,8 @@ namespace SnSApi.Models
         [JsonIgnore]
         public virtual User Sender { get; set; }
         public Sender GenericSender { get; set; }
+        // Encrypted with derived key
         public string Contents { get; set; }
+        public string IV { get; set; }
     }
 }

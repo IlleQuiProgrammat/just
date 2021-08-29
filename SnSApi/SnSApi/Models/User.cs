@@ -20,6 +20,11 @@ namespace SnSApi.Models
         [JsonIgnore]
         public virtual List<Report> Reports { get; set; }
 
+        public string PublicKey { get; set; }
+        public string PrivateKey { get; set; } // encrypted with password
+        public string SchoolPrivateKey { get; set; } // encrypted with derived ecdh key
+        public string IV { get; set; }
+        public string SchoolPrivateKeyIV { get; set; }
         public DenormalisedRole Role { get; set; }
     }
 }

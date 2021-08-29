@@ -10,5 +10,6 @@ namespace SnSApi.Models.Dto
         public MessageType Type { get; set; }
         public Sender GenericSender { get; set; }
         public string Contents { get; set; }
+        public string IV { get; set; }
     }
 }

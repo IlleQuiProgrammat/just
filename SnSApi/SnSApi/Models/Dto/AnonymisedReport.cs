@@ -14,6 +14,9 @@ namespace SnSApi.Models.Dto
         public Question Question { get; set; }
         public string Title { get; set; }
         public string ResponseContent { get; set; }
+        public string IV { get; set; }
+        public string StudentPublicKey { get; set; }
+        public string StudentPrivateKey { get; set; }
         public List<AnonymisedReportMessage> Messages { get; set; }
         public bool StudentRead { get; set; }
         public bool SchoolRead { get; set; }

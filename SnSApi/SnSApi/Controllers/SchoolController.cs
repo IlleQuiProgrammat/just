@@ -32,7 +32,11 @@ namespace SnSApi.Controllers
                 await _context.Schools.AsNoTracking()
                     .Where(school => school.SchoolId == currentUser.SchoolId)
                     .Select(school => new SchoolSettingsDto
-                        {SchoolId = school.SchoolId, Name = school.Name, EmailDomain = school.EmailDomain})
+                    {
+                        SchoolId = school.SchoolId,
+                        Name = school.Name,
+                        EmailDomain = school.EmailDomain,
+                    })
                     .SingleOrDefaultAsync()
             );
         }
@@ -45,29 +49,15 @@ namespace SnSApi.Controllers
             return Ok(
                 await _context.Users.AsNoTracking()
                     .Where(user => user.SchoolId == currentUser.SchoolId)
-                    .Select(user => new ShortUserDto {Id = user.Id, Email = user.Email, Role = user.Role})
+                    .Select(user => new ShortUserDto
+                    {
+                        Id = user.Id,
+                        Email = user.Email,
+                        Role = user.Role,
+                        PublicKey = user.PublicKey
+                    })
                     .ToListAsync()
                 );
-        }
-
-        [HttpPut("promote/{id}")]
-        [Authorize(Roles = "school_admin")]
-        public async Task<IActionResult> PromoteUser(string id)
-        {
-            var currentUser = await _userManager.GetUserAsync(HttpContext.User);
-            if (currentUser.Id == id) return BadRequest();
-            var userToPromote = await _context.Users.FindAsync(id);
-            
-            if (await _userManager.IsInRoleAsync(userToPromote, "student"))
-            {
-                Console.WriteLine($"Adding user to admin role {id}");
-                await _userManager.RemoveFromRoleAsync(userToPromote, "student");
-                await _userManager.AddToRoleAsync(userToPromote, "school_admin");
-                userToPromote.Role = DenormalisedRole.SchoolAdmin;
-                await _context.SaveChangesAsync();
-            }
-
-            return Ok();
         }
         
         [HttpPut("demote/{id}")]
@@ -77,13 +67,37 @@ namespace SnSApi.Controllers
             var currentUser = await _userManager.GetUserAsync(HttpContext.User);
             if (currentUser.Id == id) return BadRequest();
             var userToDemote = await _context.Users.FindAsync(id);
+            if (userToDemote?.SchoolId != currentUser.SchoolId) return BadRequest();
             
             if (await _userManager.IsInRoleAsync(userToDemote, "school_admin"))
             {
-                Console.WriteLine($"Removing user from admin role {id}");
                 await _userManager.RemoveFromRoleAsync(userToDemote, "school_admin");
                 await _userManager.AddToRoleAsync(userToDemote, "student");
                 userToDemote.Role = DenormalisedRole.Student;
+                userToDemote.SchoolPrivateKey = null;
+                userToDemote.SchoolPrivateKeyIV = null;
+                await _context.SaveChangesAsync();
+            }
+
+            return Ok();
+        }
+        
+        [HttpPut("promote/{id}")]
+        [Authorize(Roles = "school_admin")]
+        public async Task<IActionResult> PromoteUser(string id, [FromBody] PromotionDto promotionDto)
+        {
+            var currentUser = await _userManager.GetUserAsync(HttpContext.User);
+            if (currentUser.Id == id) return BadRequest();
+            var userToPromote = await _context.Users.FindAsync(id);
+            if (userToPromote?.SchoolId != currentUser.SchoolId) return BadRequest();
+            
+            if (await _userManager.IsInRoleAsync(userToPromote, "student"))
+            {
+                await _userManager.RemoveFromRoleAsync(userToPromote, "student");
+                await _userManager.AddToRoleAsync(userToPromote, "school_admin");
+                userToPromote.Role = DenormalisedRole.SchoolAdmin;
+                userToPromote.SchoolPrivateKey = promotionDto.PrivateKey;
+                userToPromote.SchoolPrivateKeyIV = promotionDto.PrivateKeyIV;
                 await _context.SaveChangesAsync();
             }
 

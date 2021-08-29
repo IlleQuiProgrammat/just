@@ -21,6 +21,7 @@ export const userSlice = createSlice({
       questionApi.util.resetApiState();
       reportApi.util.resetApiState();
       schoolApi.util.resetApiState();
+      localStorage.clear();
     }
   },
 });

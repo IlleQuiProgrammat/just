@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,12 +24,12 @@ namespace SnSApi
             services.Configure<IdentityOptions>(options =>
             {
                 // Password settings.
-                options.Password.RequireDigit = true;
-                options.Password.RequireLowercase = true;
-                options.Password.RequireNonAlphanumeric = true;
-                options.Password.RequireUppercase = true;
+                options.Password.RequireDigit = false;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireUppercase = false;
                 options.Password.RequiredLength = 16;
-                options.Password.RequiredUniqueChars = 6;
+                options.Password.RequiredUniqueChars = 1;
 
                 // TODO: When released
                 // options.Stores.ProtectPersonalData = true;
@@ -53,6 +54,7 @@ namespace SnSApi
             {
                 // Cookie settings
                 options.Cookie.HttpOnly = true;
+                options.Cookie.SameSite = SameSiteMode.None;
                 options.ExpireTimeSpan = TimeSpan.FromDays(1);
 
                 // TODO: Update when possible
