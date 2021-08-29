@@ -139,6 +139,9 @@ namespace SnSApi.Controllers
                     return NotFound();
                 }
                 
+                // not badrequest so the client force-updates
+                if (report.ReportStatus != ReportStatus.Unresolved) return Ok(); 
+                
                 report.SchoolRead = false;
                 
                 _context.ReportMessages.Add(new ReportMessage
@@ -165,6 +168,9 @@ namespace SnSApi.Controllers
                 {
                     return NotFound();
                 }
+                
+                // not badrequest so the client force-updates
+                if (report.ReportStatus != ReportStatus.Unresolved) return Ok(); 
 
                 report.StudentRead = false;
                 
@@ -217,10 +223,15 @@ namespace SnSApi.Controllers
                 var report = await _context.Reports
                     .Where(report => report.ReportAuthorId == user.Id && report.ReportId == id)
                     .SingleOrDefaultAsync();
+                
                 if (report is null)
                 {
                     return NotFound();
                 }
+                
+                // not badrequest so the client force-updates
+                if (report.ReportStatus != ReportStatus.Unresolved) return Ok(); 
+                
                 report.ClosedDateTime = DateTime.Now;
                 report.ReportStatus = GetNewReportStatus(status);
                 _context.ReportMessages.Add(new ReportMessage
@@ -245,6 +256,9 @@ namespace SnSApi.Controllers
                 {
                     return NotFound();
                 }
+                
+                // not badrequest so the client force-updates
+                if (report.ReportStatus != ReportStatus.Unresolved) return Ok(); 
                 
                 report.ClosedDateTime = DateTime.Now;
                 report.ReportStatus = GetNewReportStatus(status);
