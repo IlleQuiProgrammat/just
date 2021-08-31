@@ -64,4 +64,4 @@ jobs:
         tar -czf frontend.tgz sns-frontend/build
         gh release update "$tagname" "frontend.tgz#React Frontend"
       env:
-        GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}
+        GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
