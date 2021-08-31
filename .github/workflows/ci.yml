@@ -1,4 +1,4 @@
-name: .NET
+name: CI
 
 on:
   push:
@@ -8,6 +8,7 @@ jobs:
   createRelease:
     runs-on: ubuntu-latest
     steps:
+    - uses: actions/checkout@v2
     - name: Create Release
       run: |
         tagname="${GITHUB_REF#refs/tags/}"
