@@ -30,7 +30,7 @@ jobs:
         dotnet tool install --global dotnet-ef
         dotnet tool restore
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore --project ./SnSApi/SnSApi/SnSApi.csproj
     - name: Publish
       run: dotnet publish ./SnSApi/SnSApi/SnSApi.csproj -p:PublishSingleFile=true -r linux-x64 --self-contained -c Release -o api-release
     - name: Create migrations
@@ -39,7 +39,7 @@ jobs:
       run: |
         tagname="${GITHUB_REF#refs/tags/}"
         tar -czf api.tgz api-release/
-        gh release update "$tagname" "api.tgz#ASP.NET Core API"
+        gh release upload "$tagname" "api.tgz#ASP.NET Core API"
       env:
         GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
   frontend:
@@ -63,6 +63,6 @@ jobs:
       run: |
         tagname="${GITHUB_REF#refs/tags/}"
         tar -czf frontend.tgz sns-frontend/build
-        gh release update "$tagname" "frontend.tgz#React Frontend"
+        gh release upload "$tagname" "frontend.tgz#React Frontend"
       env:
         GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
