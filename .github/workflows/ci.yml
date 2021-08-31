@@ -58,7 +58,7 @@ jobs:
       run: |
         cd sns-frontend;
         npm run build;
-        rm sns-frontend/build/static/js/*.map;
+        rm ./build/static/js/*.map;
         cd ..;
     - name: Release Binaries
       run: |
