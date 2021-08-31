@@ -40,7 +40,7 @@ jobs:
         tar -czf api.tgz api-release/
         gh release update "$tagname" "api.tgz#ASP.NET Core API"
       env:
-        GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}
+        GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
   frontend:
     needs: createRelease
     runs-on: ubuntu-latest
