@@ -11,7 +11,7 @@ jobs:
     - uses: actions/checkout@v2
     - name: Create Release
       run: |
-        tagname="${GITHUB_REF#refs/tags/}"
+        tagname="${GITHUB_REF#refs/tags/}.$GITHUB_SHA"
         gh release create "$tagname"
       env:
         GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
@@ -37,7 +37,7 @@ jobs:
       run: dotnet ef migrations script --idempotent --project ./SnSApi/SnSApi/SnSApi.csproj --output api-release/migrate.sql
     - name: Release Binaries
       run: |
-        tagname="${GITHUB_REF#refs/tags/}"
+        tagname="${GITHUB_REF#refs/tags/}.$GITHUB_SHA"
         tar -czf api.tgz api-release/
         gh release upload "$tagname" "api.tgz#ASP.NET Core API"
       env:
@@ -61,7 +61,7 @@ jobs:
         cd ..;
     - name: Release Binaries
       run: |
-        tagname="${GITHUB_REF#refs/tags/}"
+        tagname="${GITHUB_REF#refs/tags/}.$GITHUB_SHA"
         tar -czf frontend.tgz sns-frontend/build
         gh release upload "$tagname" "frontend.tgz#React Frontend"
       env:
