@@ -1,7 +1,6 @@
 import { Button, Card, CardActions, CardContent, Grid, Typography, makeStyles } from '@material-ui/core';
 import React from 'react';
 import { Link as RouterLink } from 'react-router-dom';
-import { Redirect } from 'react-router-dom/cjs/react-router-dom.min';
 import { useGetSignInStatusQuery } from './services/auth';
 
 const useStyles = makeStyles({
