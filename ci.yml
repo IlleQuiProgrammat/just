@@ -1,0 +1,67 @@
+name: .NET
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  createRelease:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Create Release
+      run: |
+        tagname="${GITHUB_REF#refs/tags/}"
+        gh release create "$tagname"
+      env:
+        GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+  api:
+    needs: createRelease
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.x
+    - name: Install Global EF Core Tools
+      run: |
+        dotnet tool install --global dotnet-ef
+        dotnet tool restore
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Publish
+      run: dotnet publish ./SnSApi/SnSApi/SnSApi.csproj -p:PublishSingleFile=true -r linux-x64 --self-contained -c Release -o api-release
+    - name: Create migrations
+      run: dotnet ef migrations script --idempotent --project ./SnSApi/SnSApi/SnSApi.csproj --output api-release/migrate.sql
+    - name: Release Binaries
+      run: |
+        tagname="${GITHUB_REF#refs/tags/}"
+        tar -czf api.tgz api-release/
+        gh release update "$tagname" "api.tgz#ASP.NET Core API"
+      env:
+        GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}
+  frontend:
+    needs: createRelease
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup Node
+      uses: actions/setup-node@v2.4.0
+    - name: Install Packages
+      run: |
+        cd sns-frontend;
+        npm i;
+        cd ..;
+    - name: Build Project
+      run: |
+        cd sns-frontend;
+        npm run build;
+        cd ..;
+    - name: Release Binaries
+      run: |
+        tagname="${GITHUB_REF#refs/tags/}"
+        tar -czf frontend.tgz sns-frontend/build
+        gh release update "$tagname" "frontend.tgz#React Frontend"
+      env:
+        GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}
