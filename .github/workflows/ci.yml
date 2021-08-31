@@ -60,6 +60,8 @@ jobs:
         npm run build;
         rm ./build/static/js/*.map;
         cd ..;
+      env:
+        REACT_APP_API_URL: https://snsapi.dulcet.ga/
     - name: Release Binaries
       run: |
         tagname="${GITHUB_REF#refs/tags/}.$GITHUB_SHA"
