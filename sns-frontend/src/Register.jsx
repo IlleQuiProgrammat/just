@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Redirect } from 'react-router-dom';
 import ErrorAlert from './components/ErrorAlert';
 import { useGetSignInStatusQuery, useRegisterMutation } from './services/auth';
+import zxcvbn from 'zxcvbn';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -22,6 +23,7 @@ const Register = ({ history }) => {
   const [email, setEmail] = useState('');
   const signInStatus = useGetSignInStatusQuery();
   const [password, setPassword] = useState('');
+  const [passwordStrength, setPasswordStrength] = useState(0);
   const [tsAndCs, setTsAndCs] = useState(false);
   const [register, registerResult] = useRegisterMutation();
 
@@ -51,7 +53,12 @@ const Register = ({ history }) => {
         variant="outlined"
         name="password"
         type="password"
-        onChange={ev => setPassword(ev.target.value)}
+        onChange={ev => {
+          setPassword(ev.target.value);
+          setPasswordStrength(zxcvbn(ev.target.value, [email]).score);
+        }}
+        error={passwordStrength < 4 && password !== ''}
+        helperText={passwordStrength < 4 && password !== '' ? "This password is too weak." : undefined}
       />
       <br />
       <Checkbox
@@ -75,6 +82,7 @@ const Register = ({ history }) => {
         onClick={() => {
           register({ email, password, tsAndCs })
         }}
+        disabled={passwordStrength < 4 || !tsAndCs || email === ''}
       >
         Register
       </Button>
