@@ -104,6 +104,7 @@ namespace SnSApi.Controllers
             var question = await _context.Questions.AsNoTracking()
                 .Where(question => question.QuestionId == report.QuestionId).SingleOrDefaultAsync();
             if (question is null || question.SchoolId != user.SchoolId) return BadRequest();
+            if (string.IsNullOrWhiteSpace(report.Title)) return BadRequest();
             _context.Reports.Add(new Report
             {
                 OpenedDateTime = DateTime.Now,
