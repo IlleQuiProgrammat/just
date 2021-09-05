@@ -23,7 +23,7 @@ const Register = ({ history }) => {
   const [email, setEmail] = useState('');
   const signInStatus = useGetSignInStatusQuery();
   const [password, setPassword] = useState('');
-  const [passwordStrength, setPasswordStrength] = useState(0);
+  const [passwordResult, setPasswordResult] = useState({ score: 0 });
   const [tsAndCs, setTsAndCs] = useState(false);
   const [register, registerResult] = useRegisterMutation();
 
@@ -55,10 +55,22 @@ const Register = ({ history }) => {
         type="password"
         onChange={ev => {
           setPassword(ev.target.value);
-          setPasswordStrength(zxcvbn(ev.target.value, [email]).score);
+          setPasswordResult(zxcvbn(ev.target.value, [email]));
         }}
-        error={passwordStrength < 4 && password !== ''}
-        helperText={passwordStrength < 4 && password !== '' ? "This password is too weak." : undefined}
+        error={passwordResult.score < 3 && password !== ''}
+        helperText={passwordResult.score < 4 && password !== '' ? (
+          <div>
+            <p>This password is weak.</p>
+            <strong>{passwordResult.feedback.warning}</strong>
+            <ul>
+              {
+                passwordResult.feedback.suggestions.map(suggestion => (
+                  <li>{suggestion}</li>
+                ))
+              }
+            </ul>
+          </div>
+        ) : undefined}
       />
       <br />
       <Checkbox
@@ -82,7 +94,7 @@ const Register = ({ history }) => {
         onClick={() => {
           register({ email, password, tsAndCs })
         }}
-        disabled={passwordStrength < 4 || !tsAndCs || email === ''}
+        disabled={passwordResult.score < 3 || !tsAndCs || email === ''}
       >
         Register
       </Button>
