@@ -30,11 +30,11 @@ jobs:
         dotnet tool install --global dotnet-ef
         dotnet tool restore
     - name: Restore dependencies
-      run: dotnet restore ./SnSApi/SnSApi/SnSApi.csproj
+      run: dotnet restore ./JustApi/JustApi/JustApi.csproj
     - name: Publish
-      run: dotnet publish ./SnSApi/SnSApi/SnSApi.csproj -p:PublishSingleFile=true -r linux-x64 --self-contained -c Release -o api-release
+      run: dotnet publish ./JustApi/JustApi/JustApi.csproj -p:PublishSingleFile=true -r linux-x64 --self-contained -c Release -o api-release
     - name: Create migrations
-      run: dotnet ef migrations script --idempotent --project ./SnSApi/SnSApi/SnSApi.csproj --output api-release/migrate.sql
+      run: dotnet ef migrations script --idempotent --project ./JustApi/JustApi/JustApi.csproj --output api-release/migrate.sql
     - name: Release Binaries
       run: |
         tagname="${GITHUB_REF#refs/tags/}.$GITHUB_SHA"
@@ -51,12 +51,12 @@ jobs:
       uses: actions/setup-node@v2.4.0
     - name: Install Packages
       run: |
-        cd sns-frontend;
+        cd just-frontend;
         npm i;
         cd ..;
     - name: Build Project
       run: |
-        cd sns-frontend;
+        cd just-frontend;
         npm run build;
         rm ./build/static/js/*.map;
         cd ..;
@@ -65,7 +65,7 @@ jobs:
     - name: Release Binaries
       run: |
         tagname="${GITHUB_REF#refs/tags/}.$GITHUB_SHA"
-        tar -czf frontend.tgz sns-frontend/build
+        tar -czf frontend.tgz just-frontend/build
         gh release upload "$tagname" "frontend.tgz#React Frontend"
       env:
         GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
