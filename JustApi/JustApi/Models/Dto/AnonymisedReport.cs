@@ -10,8 +10,8 @@ namespace JustApi.Models.Dto
         public ReportStatus ReportStatus { get; set; }
         public DateTime OpenedDateTime { get; set; }
         public DateTime? ClosedDateTime { get; set; }
-        public int QuestionId { get; set; }
-        public Question Question { get; set; }
+        public int FormId { get; set; }
+        public Form Form { get; set; }
         public string Title { get; set; }
         public string ResponseContent { get; set; }
         public string IV { get; set; }

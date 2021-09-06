@@ -25,11 +25,11 @@ namespace JustApi.Models
         public ReportStatus ReportStatus { get; set; }
         public DateTime OpenedDateTime { get; set; }
         public DateTime? ClosedDateTime { get; set; }
-        public int QuestionId { get; set; }
+        public int FormId { get; set; }
         // Encrypted with derived key
         public string Title { get; set; }
         [JsonIgnore]
-        public virtual Question Question { get; set; }
+        public virtual Form Form { get; set; }
         
         // Encrypted with derived key
         public string ResponseContent { get; set; }

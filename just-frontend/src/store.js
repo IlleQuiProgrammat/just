@@ -1,7 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
 import userReducer from './features/users/userSlice';
 import { authApi } from './services/auth';
-import { questionApi } from './services/questions';
+import { formApi } from './services/forms';
 import { reportApi } from './services/report';
 import { schoolApi } from './services/school';
 
@@ -20,13 +20,13 @@ export default configureStore({
     user: userReducer,
     [reportApi.reducerPath]: reportApi.reducer,
     [authApi.reducerPath]: authApi.reducer,
-    [questionApi.reducerPath]: questionApi.reducer,
+    [formApi.reducerPath]: formApi.reducer,
     [schoolApi.reducerPath]: schoolApi.reducer
   },
   middleware: getDefaultMiddleware => getDefaultMiddleware().concat(
     // logger,
     reportApi.middleware,
-    questionApi.middleware,
+    formApi.middleware,
     authApi.middleware,
     schoolApi.middleware),
 });

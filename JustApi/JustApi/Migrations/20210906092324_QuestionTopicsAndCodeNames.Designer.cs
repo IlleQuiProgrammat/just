@@ -10,8 +10,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace JustApi.Migrations
 {
     [DbContext(typeof(ProjectContext))]
-    [Migration("20210906092324_QuestionTopicsAndCodeNames")]
-    partial class QuestionTopicsAndCodeNames
+    [Migration("20210906092324_FormTopicsAndCodeNames")]
+    partial class FormTopicsAndCodeNames
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -21,9 +21,9 @@ namespace JustApi.Migrations
                 .HasAnnotation("ProductVersion", "5.0.9")
                 .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
-            modelBuilder.Entity("JustApi.Models.Question", b =>
+            modelBuilder.Entity("JustApi.Models.Form", b =>
                 {
-                    b.Property<int>("QuestionId")
+                    b.Property<int>("FormId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
@@ -52,11 +52,11 @@ namespace JustApi.Migrations
                     b.Property<string>("Topic")
                         .HasColumnType("text");
 
-                    b.HasKey("QuestionId");
+                    b.HasKey("FormId");
 
                     b.HasIndex("SchoolId");
 
-                    b.ToTable("Questions");
+                    b.ToTable("Forms");
                 });
 
             modelBuilder.Entity("JustApi.Models.Report", b =>
@@ -75,7 +75,7 @@ namespace JustApi.Migrations
                     b.Property<DateTime>("OpenedDateTime")
                         .HasColumnType("timestamp without time zone");
 
-                    b.Property<int>("QuestionId")
+                    b.Property<int>("FormId")
                         .HasColumnType("integer");
 
                     b.Property<string>("ReportAuthorId")
@@ -107,7 +107,7 @@ namespace JustApi.Migrations
 
                     b.HasKey("ReportId");
 
-                    b.HasIndex("QuestionId");
+                    b.HasIndex("FormId");
 
                     b.HasIndex("ReportAuthorId");
 
@@ -397,10 +397,10 @@ namespace JustApi.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("JustApi.Models.Question", b =>
+            modelBuilder.Entity("JustApi.Models.Form", b =>
                 {
                     b.HasOne("JustApi.Models.School", "School")
-                        .WithMany("Questions")
+                        .WithMany("Forms")
                         .HasForeignKey("SchoolId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -410,9 +410,9 @@ namespace JustApi.Migrations
 
             modelBuilder.Entity("JustApi.Models.Report", b =>
                 {
-                    b.HasOne("JustApi.Models.Question", "Question")
+                    b.HasOne("JustApi.Models.Form", "Form")
                         .WithMany()
-                        .HasForeignKey("QuestionId")
+                        .HasForeignKey("FormId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -426,7 +426,7 @@ namespace JustApi.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Question");
+                    b.Navigation("Form");
 
                     b.Navigation("ReportAuthor");
 
@@ -521,7 +521,7 @@ namespace JustApi.Migrations
                 {
                     b.Navigation("Members");
 
-                    b.Navigation("Questions");
+                    b.Navigation("Forms");
 
                     b.Navigation("Reports");
                 });

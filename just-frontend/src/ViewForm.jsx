@@ -2,7 +2,7 @@ import { FormControl, InputLabel, MenuItem, Select, TextField, Fade, CircularPro
 import { createStyles, makeStyles } from '@material-ui/core/styles';
 import React from 'react';
 import { useParams, Redirect } from 'react-router-dom';
-import { useGetQuestionByIdQuery } from './services/questions';
+import { useGetFormByIdQuery } from './services/forms';
 import ErrorAlert from './components/ErrorAlert';
 import { useGetSignInStatusQuery } from './services/auth';
 
@@ -16,7 +16,7 @@ const useStyles = makeStyles(theme =>
   }),
 );
 
-const ViewingQuestion = ({ title, type, name, options }) => {
+const ViewingForm = ({ title, type, name, options }) => {
   switch (type) {
     case 'single':
       return (
@@ -53,12 +53,12 @@ const ViewingQuestion = ({ title, type, name, options }) => {
   }
 }
 
-const ViewQuestion = () => {
-  const { questionId } = useParams();
+const ViewForm = () => {
+  const { formId } = useParams();
   const classes = useStyles();
   const signInStatus = useGetSignInStatusQuery();
-  const questionRequest = useGetQuestionByIdQuery(questionId);
-  const { data: question, isLoading, isFetching } = questionRequest;
+  const formRequest = useGetFormByIdQuery(formId);
+  const { data: form, isLoading, isFetching } = formRequest;
 
   if (signInStatus.data === "none" && signInStatus.data) {
     return <Redirect to="/login" />
@@ -79,18 +79,18 @@ const ViewQuestion = () => {
             <CircularProgress value={isLoading || isFetching ? undefined : 0} />
           </div>
       </Fade>
-      <ErrorAlert apiResult={questionRequest} />
+      <ErrorAlert apiResult={formRequest} />
       
-      <h1>{question?.name} </h1>
+      <h1>{form?.name} </h1>
       {
-        question
+        form
           ? <p>This is an example form meaning that you can interact but cannot submit it.</p>
           : null
       }
-      <p>{question?.description}</p>
+      <p>{form?.description}</p>
 
       {/* {
-        question
+        form
           ? <FormControl variant="outlined" className={classes.formControl}>
             <TextField
               variant="outlined"
@@ -101,17 +101,17 @@ const ViewQuestion = () => {
       } */}
       <br />
       {
-        JSON.parse(question?.definition ?? "null")?.map(question => (
-          <React.Fragment key={question.name}>
+        JSON.parse(form?.definition ?? "null")?.map(form => (
+          <React.Fragment key={form.name}>
             <FormControl variant="outlined" className={classes.formControl}>
               {
-                question.type === 'select'
-                  ? <InputLabel htmlFor={`${question.name}_${question.type}`}>
-                      {question.title}
+                form.type === 'select'
+                  ? <InputLabel htmlFor={`${form.name}_${form.type}`}>
+                      {form.title}
                     </InputLabel>
                   : null
               }
-              <ViewingQuestion {...question} />
+              <ViewingForm {...form} />
             </FormControl>
             <br />
           </React.Fragment>
@@ -121,4 +121,4 @@ const ViewQuestion = () => {
   );
 }
 
-export default ViewQuestion;
+export default ViewForm;

@@ -65,7 +65,7 @@ export const reportApi = createApi({
     }),
     // TODO: Encrypt all the things
     createReport: builder.mutation({
-      queryFn: async ({ questionId, title, responseContent, schoolPublicKey, symmetricEncryptionKey }, api, options, baseQuery) => {
+      queryFn: async ({ formId, title, responseContent, schoolPublicKey, symmetricEncryptionKey }, api, options, baseQuery) => {
         let keyPair = await generateKeypair();
         let publicKey = await window.crypto.subtle.exportKey("spki", keyPair.publicKey);
         let privateKeyPlain = await window.crypto.subtle.exportKey("pkcs8", keyPair.privateKey);
@@ -78,7 +78,7 @@ export const reportApi = createApi({
           url: 'reports/',
           method: 'POST',
           body: {
-            questionId,
+            formId,
             title,
             responseContent: base64EncArr(encryptedResponseContent),
             studentPublicKey: base64EncArr(publicKey),

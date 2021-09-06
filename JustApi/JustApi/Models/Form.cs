@@ -2,9 +2,9 @@
 
 namespace JustApi.Models
 {
-    public class Question
+    public class Form
     {
-        public int QuestionId { get; set; }
+        public int FormId { get; set; }
         public int SchoolId { get; set; }
         [JsonIgnore]
         public virtual School School { get; set; }

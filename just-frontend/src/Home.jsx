@@ -85,7 +85,7 @@ const Home = () => {
                   Settings
                 </Typography>
                 <Typography color="textSecondary">
-                  Configure your school's settings, questions and users.
+                  Configure your school's settings, forms and users.
                 </Typography>
               </CardContent>
               <CardActions>

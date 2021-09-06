@@ -17,6 +17,6 @@ namespace JustApi.Models
         [JsonIgnore]
         public virtual List<Report> Reports { get; set; }
         [JsonIgnore]
-        public virtual List<Question> Questions { get; set; }
+        public virtual List<Form> Forms { get; set; }
     }
 }

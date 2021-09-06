@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { authApi } from '../../services/auth';
-import { questionApi } from '../../services/questions';
+import { formApi } from '../../services/forms';
 import { reportApi } from '../../services/report';
 import { schoolApi } from '../../services/school';
 
@@ -18,7 +18,7 @@ export const userSlice = createSlice({
     signout: state => {
       state.signedIn = false;
       authApi.util.resetApiState();
-      questionApi.util.resetApiState();
+      formApi.util.resetApiState();
       reportApi.util.resetApiState();
       schoolApi.util.resetApiState();
       localStorage.clear();

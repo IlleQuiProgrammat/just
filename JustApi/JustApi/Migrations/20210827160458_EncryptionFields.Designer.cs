@@ -125,9 +125,9 @@ namespace JustApi.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("JustApi.Models.Question", b =>
+            modelBuilder.Entity("JustApi.Models.Form", b =>
                 {
-                    b.Property<int>("QuestionId")
+                    b.Property<int>("FormId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
@@ -147,11 +147,11 @@ namespace JustApi.Migrations
                     b.Property<int>("SchoolId")
                         .HasColumnType("integer");
 
-                    b.HasKey("QuestionId");
+                    b.HasKey("FormId");
 
                     b.HasIndex("SchoolId");
 
-                    b.ToTable("Questions");
+                    b.ToTable("Forms");
                 });
 
             modelBuilder.Entity("JustApi.Models.Report", b =>
@@ -170,7 +170,7 @@ namespace JustApi.Migrations
                     b.Property<DateTime>("OpenedDateTime")
                         .HasColumnType("timestamp without time zone");
 
-                    b.Property<int>("QuestionId")
+                    b.Property<int>("FormId")
                         .HasColumnType("integer");
 
                     b.Property<string>("ReportAuthorId")
@@ -202,7 +202,7 @@ namespace JustApi.Migrations
 
                     b.HasKey("ReportId");
 
-                    b.HasIndex("QuestionId");
+                    b.HasIndex("FormId");
 
                     b.HasIndex("ReportAuthorId");
 
@@ -436,10 +436,10 @@ namespace JustApi.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("JustApi.Models.Question", b =>
+            modelBuilder.Entity("JustApi.Models.Form", b =>
                 {
                     b.HasOne("JustApi.Models.School", "School")
-                        .WithMany("Questions")
+                        .WithMany("Forms")
                         .HasForeignKey("SchoolId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -449,9 +449,9 @@ namespace JustApi.Migrations
 
             modelBuilder.Entity("JustApi.Models.Report", b =>
                 {
-                    b.HasOne("JustApi.Models.Question", "Question")
+                    b.HasOne("JustApi.Models.Form", "Form")
                         .WithMany()
-                        .HasForeignKey("QuestionId")
+                        .HasForeignKey("FormId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -465,7 +465,7 @@ namespace JustApi.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Question");
+                    b.Navigation("Form");
 
                     b.Navigation("ReportAuthor");
 
@@ -509,7 +509,7 @@ namespace JustApi.Migrations
                 {
                     b.Navigation("Members");
 
-                    b.Navigation("Questions");
+                    b.Navigation("Forms");
 
                     b.Navigation("Reports");
                 });

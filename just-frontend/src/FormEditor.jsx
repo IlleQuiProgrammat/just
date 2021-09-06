@@ -5,7 +5,7 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { useHistory, Redirect } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import ErrorAlert from './components/ErrorAlert';
-import { useCreateQuestionMutation } from './services/questions';
+import { useCreateFormMutation } from './services/forms';
 import { useGetSignInStatusQuery } from './services/auth';
 
 const useStyles = makeStyles(theme =>
@@ -43,11 +43,11 @@ const areFieldsOk = fields => {
   )
 }
 
-const QuestionEditor = () => {
+const FormEditor = () => {
   const classes = useStyles();
   const history = useHistory();
   const signInStatus = useGetSignInStatusQuery();
-  const [createQuestion, createQuestionResponse] = useCreateQuestionMutation();
+  const [createForm, createFormResponse] = useCreateFormMutation();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [codeName, setCodeName] = useState('');
@@ -66,10 +66,10 @@ const QuestionEditor = () => {
 
   return (
     <>
-      <h1>Create Question</h1>
+      <h1>Create Form</h1>
       <ErrorAlert
-        apiResult={createQuestionResponse}
-        customTitle="An unknown error occurred when creating the question."
+        apiResult={createFormResponse}
+        customTitle="An unknown error occurred when creating the form."
       />
       <TextField
         className={classes.field}
@@ -220,7 +220,7 @@ const QuestionEditor = () => {
             || isEmptyOrWhitespace(topic)
             || !areFieldsOk(fields)}
           onClick={() => {
-            createQuestion({
+            createForm({
               name,
               description,
               codeName,
@@ -239,4 +239,4 @@ const QuestionEditor = () => {
   );
 }
 
-export default QuestionEditor;
+export default FormEditor;

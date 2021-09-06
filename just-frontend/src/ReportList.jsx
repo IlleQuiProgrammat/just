@@ -4,7 +4,7 @@ import { Badge, createStyles, Link as MuiLink, makeStyles, Fade, LinearProgress 
 import { Link, Redirect } from 'react-router-dom';
 import ResolutionChip from './components/ResolutionChip';
 import { useGetShortReportsQuery } from './services/report';
-import { useGetAllShortQuestionsQuery } from './services/questions';
+import { useGetAllShortFormsQuery } from './services/forms';
 import { useGetSignInStatusQuery } from './services/auth';
 
 const useStyles = makeStyles(theme =>
@@ -24,16 +24,16 @@ const ReportList = () => {
   const reportsRequest = useGetShortReportsQuery(undefined, { pollingInterval: 120 * 1000 });
   const { data: unTransformedReports, isLoading, isFetching, error: reportsError } = reportsRequest;
   const reports = unTransformedReports?.map(report => ({ ...report, id: report.reportId }));
-  const questionsRequest = useGetAllShortQuestionsQuery(undefined, { pollingInterval: 120 * 1000 });
+  const formsRequest = useGetAllShortFormsQuery(undefined, { pollingInterval: 120 * 1000 });
   const {
-    data: questions,
-    isLoading: isLoadingQuestions,
-    isFetching: isFetchingQuestions,
-    error: questionsError
-  } = questionsRequest;
+    data: forms,
+    isLoading: isLoadingForms,
+    isFetching: isFetchingForms,
+    error: formsError
+  } = formsRequest;
 
-  const anyRequestLoading = isLoading || isFetching || isLoadingQuestions || isFetchingQuestions;
-  const anyRequestError = questionsError || reportsError;
+  const anyRequestLoading = isLoading || isFetching || isLoadingForms || isFetchingForms;
+  const anyRequestError = formsError || reportsError;
 
   if (signInStatus.data !== "school_admin" && signInStatus.data) {
     return <Redirect to="/login" />
@@ -56,7 +56,7 @@ const ReportList = () => {
       minWidth: 150,
       flex: 1,
       editable: false,
-      valueGetter: params => questions?.filter(question => question.id === params.value)[0]?.name
+      valueGetter: params => forms?.filter(form => form.id === params.value)[0]?.name
     },
     {
       field: 'openedDateTime',

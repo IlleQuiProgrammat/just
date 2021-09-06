@@ -2,26 +2,26 @@
 
 namespace JustApi.Migrations
 {
-    public partial class QuestionTopicsAndCodeNames : Migration
+    public partial class FormTopicsAndCodeNames : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<string>(
                 name: "CodeName",
-                table: "Questions",
+                table: "Forms",
                 type: "text",
                 nullable: true);
 
             migrationBuilder.AddColumn<bool>(
                 name: "Retired",
-                table: "Questions",
+                table: "Forms",
                 type: "boolean",
                 nullable: false,
                 defaultValue: false);
 
             migrationBuilder.AddColumn<string>(
                 name: "Topic",
-                table: "Questions",
+                table: "Forms",
                 type: "text",
                 nullable: true);
         }
@@ -30,15 +30,15 @@ namespace JustApi.Migrations
         {
             migrationBuilder.DropColumn(
                 name: "CodeName",
-                table: "Questions");
+                table: "Forms");
 
             migrationBuilder.DropColumn(
                 name: "Retired",
-                table: "Questions");
+                table: "Forms");
 
             migrationBuilder.DropColumn(
                 name: "Topic",
-                table: "Questions");
+                table: "Forms");
         }
     }
 }

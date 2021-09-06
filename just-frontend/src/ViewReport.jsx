@@ -142,13 +142,13 @@ const ViewReport = () => {
             <Table aria-label="Response Contents">
               <TableHead>
                 <TableRow>
-                  <TableCell>Question Name</TableCell>
-                  <TableCell>Question Response</TableCell>
+                  <TableCell>Question</TableCell>
+                  <TableCell>Response</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {
-                  JSON.parse(fullReport.question.definition).map(field => (
+                  JSON.parse(fullReport.form.definition).map(field => (
                     <TableRow>
                       <TableCell>{field.title}</TableCell>
                       <TableCell>{getResponseFromFieldName(field.name)}</TableCell>

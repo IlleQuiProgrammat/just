@@ -92,10 +92,10 @@ namespace JustApi.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Questions",
+                name: "Forms",
                 columns: table => new
                 {
-                    QuestionId = table.Column<int>(type: "integer", nullable: false)
+                    FormId = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     SchoolId = table.Column<int>(type: "integer", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: true),
@@ -105,9 +105,9 @@ namespace JustApi.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Questions", x => x.QuestionId);
+                    table.PrimaryKey("PK_Forms", x => x.FormId);
                     table.ForeignKey(
-                        name: "FK_Questions_Schools_SchoolId",
+                        name: "FK_Forms_Schools_SchoolId",
                         column: x => x.SchoolId,
                         principalTable: "Schools",
                         principalColumn: "SchoolId",
@@ -210,7 +210,7 @@ namespace JustApi.Migrations
                     ReportStatus = table.Column<int>(type: "integer", nullable: false),
                     OpenedDateTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     ClosedDateTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: true),
-                    QuestionId = table.Column<int>(type: "integer", nullable: false),
+                    FormId = table.Column<int>(type: "integer", nullable: false),
                     Title = table.Column<string>(type: "text", nullable: true),
                     ResponseContent = table.Column<string>(type: "text", nullable: true)
                 },
@@ -224,10 +224,10 @@ namespace JustApi.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Reports_Questions_QuestionId",
-                        column: x => x.QuestionId,
-                        principalTable: "Questions",
-                        principalColumn: "QuestionId",
+                        name: "FK_Reports_Forms_FormId",
+                        column: x => x.FormId,
+                        principalTable: "Forms",
+                        principalColumn: "FormId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Reports_Schools_SchoolId",
@@ -310,8 +310,8 @@ namespace JustApi.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Questions_SchoolId",
-                table: "Questions",
+                name: "IX_Forms_SchoolId",
+                table: "Forms",
                 column: "SchoolId");
 
             migrationBuilder.CreateIndex(
@@ -325,9 +325,9 @@ namespace JustApi.Migrations
                 column: "SenderId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Reports_QuestionId",
+                name: "IX_Reports_FormId",
                 table: "Reports",
-                column: "QuestionId");
+                column: "FormId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Reports_ReportAuthorId",
@@ -370,7 +370,7 @@ namespace JustApi.Migrations
                 name: "AspNetUsers");
 
             migrationBuilder.DropTable(
-                name: "Questions");
+                name: "Forms");
 
             migrationBuilder.DropTable(
                 name: "Schools");

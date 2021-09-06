@@ -3,7 +3,7 @@ import { createStyles, makeStyles } from '@material-ui/core/styles';
 import { Warning } from '@material-ui/icons';
 import React, { useState } from 'react';
 import { useHistory, Redirect } from 'react-router-dom';
-import { useGetActiveShortQuestionsQuery, useGetQuestionByIdQuery } from './services/questions';
+import { useGetActiveShortFormsQuery, useGetFormByIdQuery } from './services/forms';
 import { useCreateReportMutation } from './services/report';
 import ErrorAlert from './components/ErrorAlert';
 import { useGetKeysQuery, useGetSignInStatusQuery } from './services/auth';
@@ -21,7 +21,7 @@ const useStyles = makeStyles(theme =>
   }),
 );
 
-const Question = ({ title, type, name, options, setFieldData }) => {
+const Form = ({ title, type, name, options, setFieldData }) => {
   switch (type) {
     case 'single':
       return (
@@ -73,11 +73,11 @@ const CreateReport = () => {
   const classes = useStyles();
   const history = useHistory();
   const signInStatus = useGetSignInStatusQuery();
-  const questionsRequest = useGetActiveShortQuestionsQuery();
-  const { data: questions } = questionsRequest;
-  const [questionId, setQuestionId] = useState('');
-  const questionChosenRequest = useGetQuestionByIdQuery(questionId);
-  const questionChosen = questionChosenRequest.isSuccess ? questionChosenRequest.data : null;
+  const formsRequest = useGetActiveShortFormsQuery();
+  const { data: forms } = formsRequest;
+  const [formId, setFormId] = useState('');
+  const formChosenRequest = useGetFormByIdQuery(formId);
+  const formChosen = formChosenRequest.isSuccess ? formChosenRequest.data : null;
   const [createReport, createReportResult] = useCreateReportMutation();
   const [fieldData, setFieldData] = useState({});
   const { data: keys } = useGetKeysQuery();
@@ -86,7 +86,7 @@ const CreateReport = () => {
     return <Redirect to="/login" />
   }
 
-  const questionGroups = questionsRequest.data?.map(question => (question.topic)
+  const formGroups = formsRequest.data?.map(form => (form.topic)
     ).sort(
     ).filter((v, i, arr) => i === 0 || arr[i-1] !== v) ?? [];
 
@@ -114,8 +114,8 @@ const CreateReport = () => {
       <FormControl variant="outlined" className={classes.formControl}>
         <InputLabel htmlFor="report_type_selection">Report Type</InputLabel>
         <Select
-          value={questionId}
-          onChange={ev => setQuestionId(ev.target.value)}
+          value={formId}
+          onChange={ev => setFormId(ev.target.value)}
           label="Report Type"
           inputProps={{
             name: 'report_type',
@@ -126,12 +126,12 @@ const CreateReport = () => {
             <em>None</em>
           </MenuItem>
           {
-            questionGroups.map(group => (
+            formGroups.map(group => (
               [
                 <ListSubheader>{group}</ListSubheader>,
-                ...questions?.filter(question => question.topic === group).map(question => (
-                    <MenuItem key={question.questionId} value={question.questionId}>
-                      {question.name}
+                ...forms?.filter(form => form.topic === group).map(form => (
+                    <MenuItem key={form.formId} value={form.formId}>
+                      {form.name}
                     </MenuItem>
                   ))
               ]
@@ -139,19 +139,19 @@ const CreateReport = () => {
           }
         </Select>
       </FormControl>
-      <p>{questionChosen?.description}</p>
+      <p>{formChosen?.description}</p>
       {
-        JSON.parse(questionChosen?.definition ?? "null")?.map(question => (
-          <React.Fragment key={question.name}>
+        JSON.parse(formChosen?.definition ?? "null")?.map(form => (
+          <React.Fragment key={form.name}>
             <FormControl variant="outlined" className={classes.formControl}>
               {
-                question.type === 'select'
-                  ? <InputLabel htmlFor={`${question.name}_${question.type}`}>
-                      {question.title}
+                form.type === 'select'
+                  ? <InputLabel htmlFor={`${form.name}_${form.type}`}>
+                      {form.title}
                     </InputLabel>
                   : null
               }
-              <Question {...question} setFieldData={setFieldData} />
+              <Form {...form} setFieldData={setFieldData} />
             </FormControl>
             <br />
           </React.Fragment>
@@ -161,10 +161,10 @@ const CreateReport = () => {
         variant="contained"
         color="primary"
         className={classes.submit}
-        disabled={questionId === ''}
+        disabled={formId === ''}
         onClick={() => {
           createReport({
-            questionId,
+            formId,
             responseContent: JSON.stringify(
               Object.keys(fieldData).map(key => ({ name: key, value: fieldData[key] }))
             ),

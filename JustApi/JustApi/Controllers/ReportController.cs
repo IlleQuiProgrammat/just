@@ -38,7 +38,7 @@ namespace JustApi.Controllers
             {
                 var report = await _context.Reports
                     .Include(report => report.Messages)
-                    .Include(report => report.Question)
+                    .Include(report => report.Form)
                     .Where(report => report.ReportAuthorId == user.Id && report.ReportId == id)
                     .SingleOrDefaultAsync();
                 if (report is null)
@@ -56,7 +56,7 @@ namespace JustApi.Controllers
             {
                 var report = await _context.Reports
                     .Include(report => report.Messages)
-                    .Include(report => report.Question)
+                    .Include(report => report.Form)
                     .Where(report => report.SchoolId == user.SchoolId && report.ReportId == id)
                     .SingleOrDefaultAsync();
                 if (report is null)
@@ -112,20 +112,20 @@ namespace JustApi.Controllers
         public async Task<IActionResult> CreateReport(ReportCreationDto report)
         {
             var user = await _userManager.GetUserAsync(HttpContext.User);
-            var question = await _context.Questions.AsNoTracking()
-                .Where(question => question.QuestionId == report.QuestionId && question.SchoolId == user.SchoolId)
+            var form = await _context.Forms.AsNoTracking()
+                .Where(form => form.FormId == report.FormId && form.SchoolId == user.SchoolId)
                 .SingleOrDefaultAsync();
-            if (question is null || question.SchoolId != user.SchoolId) return BadRequest();
+            if (form is null || form.SchoolId != user.SchoolId) return BadRequest();
             
             _context.Reports.Add(new Report
             {
                 OpenedDateTime = DateTime.Now,
                 ClosedDateTime = null,
-                QuestionId = report.QuestionId,
+                FormId = report.FormId,
                 ReportAuthorId = user.Id,
                 SchoolId = user.SchoolId,
                 ReportStatus = ReportStatus.Unresolved,
-                Title = GenerateReportTitle(question.CodeName),
+                Title = GenerateReportTitle(form.CodeName),
                 ResponseContent = report.ResponseContent,
                 StudentPublicKey = report.StudentPublicKey,
                 StudentPrivateKey = report.StudentPrivateKey,

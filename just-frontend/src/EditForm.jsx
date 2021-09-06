@@ -5,7 +5,7 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { useHistory, Redirect } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import ErrorAlert from './components/ErrorAlert';
-import { useEditQuestionMutation, useGetQuestionByIdQuery } from './services/questions';
+import { useEditFormMutation, useGetFormByIdQuery } from './services/forms';
 import { useGetSignInStatusQuery } from './services/auth';
 import { useParams } from 'react-router-dom';
 import { Alert } from '@material-ui/lab';
@@ -45,13 +45,13 @@ const areFieldsOk = fields => {
   )
 }
 
-const QuestionEditor = () => {
+const FormEditor = () => {
   const classes = useStyles();
   const history = useHistory();
-  const { questionId } = useParams();
+  const { formId } = useParams();
   const signInStatus = useGetSignInStatusQuery();
-  const questionResult = useGetQuestionByIdQuery(questionId);
-  const [editQuestion, editQuestionResponse] = useEditQuestionMutation();
+  const formResult = useGetFormByIdQuery(formId);
+  const [editForm, editFormResponse] = useEditFormMutation();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [codeName, setCodeName] = useState('');
@@ -59,18 +59,18 @@ const QuestionEditor = () => {
   const [fields, setFields] = useState([{ type: '', title: '', name: uuidv4() }]);
 
   useEffect(() => {
-    setName(questionResult.data?.name);
-    setDescription(questionResult.data?.description);
-    setCodeName(questionResult.data?.codeName);
-    setTopic(questionResult.data?.topic);
-    setFields(JSON.parse(questionResult.data?.definition ?? "[]"));
-  }, [questionResult])
+    setName(formResult.data?.name);
+    setDescription(formResult.data?.description);
+    setCodeName(formResult.data?.codeName);
+    setTopic(formResult.data?.topic);
+    setFields(JSON.parse(formResult.data?.definition ?? "[]"));
+  }, [formResult])
 
   if (signInStatus.data !== "school_admin" && signInStatus.data) {
     return <Redirect to="/login" />;
   }
 
-  if (questionResult.data?.retired) {
+  if (formResult.data?.retired) {
     return <Redirect to="/school_settings" />;
   }
 
@@ -82,14 +82,14 @@ const QuestionEditor = () => {
 
   return (
     <>
-      <h1>Edit Question</h1>
+      <h1>Edit Form</h1>
       <ErrorAlert
-        apiResult={editQuestionResponse}
-        customTitle="An unknown error occurred when editing the question."
+        apiResult={editFormResponse}
+        customTitle="An unknown error occurred when editing the form."
       />
       <ErrorAlert
-        apiResult={questionResult}
-        customTitle="An unknown error occurred when fetching the question."
+        apiResult={formResult}
+        customTitle="An unknown error occurred when fetching the form."
       />
       <TextField
         className={classes.field}
@@ -244,8 +244,8 @@ const QuestionEditor = () => {
             || isEmptyOrWhitespace(codeName)
             || !areFieldsOk(fields)}
           onClick={() => {
-            editQuestion({
-              questionId,
+            editForm({
+              formId,
               name,
               description,
               codeName,
@@ -264,4 +264,4 @@ const QuestionEditor = () => {
   );
 }
 
-export default QuestionEditor;
+export default FormEditor;

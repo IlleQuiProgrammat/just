@@ -4,7 +4,7 @@ import { Link, Redirect } from 'react-router-dom';
 import { useGetSchoolUsersQuery, useGetSchoolSettingsQuery, usePromoteUserMutation, useDemoteUserMutation } from './services/school';
 import ErrorAlert from './components/ErrorAlert';
 import { Alert } from '@material-ui/lab';
-import { useGetAllShortQuestionsQuery, useSetQuestionActivityMutation } from './services/questions';
+import { useGetAllShortFormsQuery, useSetFormActivityMutation } from './services/forms';
 import { useGetKeysQuery, useGetSignInStatusQuery } from './services/auth';
 
 const useStyles = makeStyles(theme => ({
@@ -26,15 +26,15 @@ const Settings = () => {
   const { data: keys } = useGetKeysQuery();
   const [promoteUser, promoteUserRepsonse] = usePromoteUserMutation();
   const [demoteUser, demoteUserResponse] = useDemoteUserMutation();
-  const [setQuestionActivity, setQuestionActivityResponse] = useSetQuestionActivityMutation();
+  const [setFormActivity, setFormActivityResponse] = useSetFormActivityMutation();
   const userRequest = useGetSchoolUsersQuery();
   const settingsRequest = useGetSchoolSettingsQuery();
-  const questionsRequest = useGetAllShortQuestionsQuery();
+  const formsRequest = useGetAllShortFormsQuery();
   const anythingLoading = userRequest.isLoading || userRequest.isFetching
-    || settingsRequest.isLoading || userRequest.isFetching || questionsRequest.isLoading
-    || questionsRequest.isFetching;
+    || settingsRequest.isLoading || userRequest.isFetching || formsRequest.isLoading
+    || formsRequest.isFetching;
   
-  const questionGroups = questionsRequest.data?.map(question => (question.topic)
+  const formGroups = formsRequest.data?.map(form => (form.topic)
     ).sort(
     ).filter((v, i, arr) => i === 0 || arr[i-1] !== v) ?? [];
 
@@ -62,8 +62,8 @@ const Settings = () => {
       <ErrorAlert apiResult={promoteUserRepsonse} customTitle="Unknown error when promoting user." />
       <ErrorAlert apiResult={settingsRequest} customTitle="Unknown error when retrieving settings." />
       <ErrorAlert apiResult={userRequest} customTitle="Unknown error when retrieving user list." />
-      <ErrorAlert apiResult={questionsRequest} customTitle="Unknown error when retrieving questions list." />
-      <ErrorAlert apiResult={setQuestionActivityResponse} customTitle="Unknown error when setting question activity." />
+      <ErrorAlert apiResult={formsRequest} customTitle="Unknown error when retrieving forms list." />
+      <ErrorAlert apiResult={setFormActivityResponse} customTitle="Unknown error when setting form activity." />
       <TextField
         variant="outlined"
         value={settingsRequest.data?.name ?? 'Loading...'}
@@ -79,13 +79,13 @@ const Settings = () => {
         className={classes.tf}
         value={settingsRequest.data?.emailDomain ?? 'Loading...'}
       />
-      <h1>Questions</h1>
+      <h1>Forms</h1>
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
             <TableRow>
               <TableCell>
-                Question Name
+                Form Name
               </TableCell>
               <TableCell>
                 Code Name
@@ -103,23 +103,23 @@ const Settings = () => {
           </TableHead>
           <TableBody>
             {
-              questionGroups.map(group => (
+              formGroups.map(group => (
                 <>
                 <tr>
                   <td colspan="5" className={classes.tableSubHeading}>{group}</td>
                 </tr>
                   {
-                    questionsRequest.data?.filter(q => q.topic === group).map(question => (
-                      <TableRow key={question.questionId}>
-                        <TableCell>{question.name}</TableCell>
-                        <TableCell>{question.codeName}</TableCell>
+                    formsRequest.data?.filter(q => q.topic === group).map(form => (
+                      <TableRow key={form.formId}>
+                        <TableCell>{form.name}</TableCell>
+                        <TableCell>{form.codeName}</TableCell>
                         <TableCell>
                           <Checkbox
                             color="primary"
-                            checked={question.active}
+                            checked={form.active}
                             onChange={
-                              ev => setQuestionActivity({
-                                questionId: question.questionId,
+                              ev => setFormActivity({
+                                formId: form.formId,
                                 activity: ev.target.checked
                               })
                             }
@@ -130,7 +130,7 @@ const Settings = () => {
                             variant="text"
                             color="primary"
                             component={Link}
-                            to={`/view_question/${question.questionId}`}
+                            to={`/view_form/${form.formId}`}
                           >
                             View
                           </Button>
@@ -140,7 +140,7 @@ const Settings = () => {
                             variant="text"
                             color="primary"
                             component={Link}
-                            to={`/edit_question/${question.questionId}`}
+                            to={`/edit_form/${form.formId}`}
                           >
                             Edit
                           </Button>
@@ -156,7 +156,7 @@ const Settings = () => {
         <Button
           variant="text"
           component={Link}
-          to="/create_question"
+          to="/create_form"
           color="primary"
           style={{ width: '100%' }}
         >

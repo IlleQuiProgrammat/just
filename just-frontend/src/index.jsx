@@ -11,8 +11,8 @@ import { Provider } from 'react-redux';
 import store from './store';
 import CreateReport from './CreateReport';
 import Home from './Home';
-import QuestionEditor from './QuestionEditor';
-import EditQuestion from './EditQuestion';
+import FormEditor from './FormEditor';
+import EditForm from './EditForm';
 import ReportList from './ReportList';
 import Settings from './Settings';
 import ViewReport from './ViewReport';
@@ -20,7 +20,7 @@ import Login from './Login';
 import Register from './Register';
 import Header from './components/Header';
 import MyReportList from './MyReportList';
-import ViewQuestion from './ViewQuestion';
+import ViewForm from './ViewForm';
 
 export default function ScrollToTop() {
   const { pathname } = useLocation();
@@ -56,14 +56,14 @@ ReactDOM.render(
               <Route path="/school_settings">
                 <Settings />
               </Route>
-              <Route path="/create_question">
-                <QuestionEditor />
+              <Route path="/create_form">
+                <FormEditor />
               </Route>
-              <Route path="/view_question/:questionId">
-                <ViewQuestion />
+              <Route path="/view_form/:formId">
+                <ViewForm />
               </Route>
-              <Route path="/edit_question/:questionId">
-                <EditQuestion />
+              <Route path="/edit_form/:formId">
+                <EditForm />
               </Route>
               <Route path="/login">
                 <Login />

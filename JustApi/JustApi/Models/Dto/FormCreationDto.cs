@@ -1,6 +1,6 @@
 ﻿namespace JustApi.Models.Dto
 {
-    public class QuestionCreationDto
+    public class FormCreationDto
     {
         public string Name { get; set; }
         public string Topic { get; set; }

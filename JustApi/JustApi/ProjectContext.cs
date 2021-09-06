@@ -11,7 +11,7 @@ namespace JustApi
         {
         }
 
-        public DbSet<Question> Questions { get; set; }
+        public DbSet<Form> Forms { get; set; }
         public DbSet<Report> Reports { get; set; }
         public DbSet<ReportMessage> ReportMessages { get; set; }
         public DbSet<School> Schools { get; set; }
