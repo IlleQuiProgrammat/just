@@ -12,6 +12,7 @@ import store from './store';
 import CreateReport from './CreateReport';
 import Home from './Home';
 import QuestionEditor from './QuestionEditor';
+import EditQuestion from './EditQuestion';
 import ReportList from './ReportList';
 import Settings from './Settings';
 import ViewReport from './ViewReport';
@@ -60,6 +61,9 @@ ReactDOM.render(
               </Route>
               <Route path="/view_question/:questionId">
                 <ViewQuestion />
+              </Route>
+              <Route path="/edit_question/:questionId">
+                <EditQuestion />
               </Route>
               <Route path="/login">
                 <Login />

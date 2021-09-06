@@ -59,7 +59,7 @@ namespace JustApi.Controllers
                     .ToListAsync()
                 );
         }
-        
+
         [HttpPut("demote/{id}")]
         [Authorize(Roles = "school_admin")]
         public async Task<IActionResult> DemoteUser(string id)

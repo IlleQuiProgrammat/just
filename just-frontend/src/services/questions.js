@@ -49,6 +49,14 @@ export const questionApi = createApi({
         body: question
       }),
       invalidatesTags: (result, error, args) => [{ type: 'ShortQuestion', id: 'LIST' }]
+    }),
+    editQuestion: builder.mutation({
+      query: question => ({
+        url: `questions/${question.questionId}`,
+        method: 'PUT',
+        body: question
+      }),
+      invalidatesTags: (result, error, args) => [{ type: 'ShortQuestion', id: 'LIST' }]
     })
   })
 })
@@ -58,5 +66,6 @@ export const {
   useGetActiveShortQuestionsQuery,
   useGetAllShortQuestionsQuery,
   useSetQuestionActivityMutation,
-  useCreateQuestionMutation
+  useCreateQuestionMutation,
+  useEditQuestionMutation
 } = questionApi;

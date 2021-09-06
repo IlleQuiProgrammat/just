@@ -12,6 +12,11 @@ const useStyles = makeStyles(theme => ({
     marginBottom: theme.spacing(2),
     width: '100%',
     maxWidth: 550
+  },
+  tableSubHeading: {
+    fontWeight: 'bold',
+    padding: theme.spacing(1),
+    backgroundColor: 'rgba(224, 224, 224, 0.8)', //'1px #E0E0E0 solid'
   }
 }));
 
@@ -28,6 +33,10 @@ const Settings = () => {
   const anythingLoading = userRequest.isLoading || userRequest.isFetching
     || settingsRequest.isLoading || userRequest.isFetching || questionsRequest.isLoading
     || questionsRequest.isFetching;
+  
+  const questionGroups = questionsRequest.data?.map(question => (question.topic)
+    ).sort(
+    ).filter((v, i, arr) => i === 0 || arr[i-1] !== v) ?? [];
 
   if (signInStatus.data !== "school_admin" && signInStatus.data) {
     return <Redirect to="/login" />
@@ -79,41 +88,67 @@ const Settings = () => {
                 Question Name
               </TableCell>
               <TableCell>
+                Code Name
+              </TableCell>
+              <TableCell>
                 Active
               </TableCell>
               <TableCell>
                 View
               </TableCell>
+              <TableCell>
+                Edit
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {
-              questionsRequest.data?.map(question => (
-                <TableRow key={question.questionId}>
-                  <TableCell>{question.name}</TableCell>
-                  <TableCell>
-                    <Checkbox
-                      color="primary"
-                      checked={question.active}
-                      onChange={
-                        ev => setQuestionActivity({
-                          questionId: question.questionId,
-                          activity: ev.target.checked
-                        })
-                      }
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Button
-                      variant="text"
-                      color="primary"
-                      component={Link}
-                      to={`/view_question/${question.questionId}`}
-                    >
-                      View
-                    </Button>
-                  </TableCell>
-                </TableRow>
+              questionGroups.map(group => (
+                <>
+                <tr>
+                  <td colspan="5" className={classes.tableSubHeading}>{group}</td>
+                </tr>
+                  {
+                    questionsRequest.data?.filter(q => q.topic === group).map(question => (
+                      <TableRow key={question.questionId}>
+                        <TableCell>{question.name}</TableCell>
+                        <TableCell>{question.codeName}</TableCell>
+                        <TableCell>
+                          <Checkbox
+                            color="primary"
+                            checked={question.active}
+                            onChange={
+                              ev => setQuestionActivity({
+                                questionId: question.questionId,
+                                activity: ev.target.checked
+                              })
+                            }
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <Button
+                            variant="text"
+                            color="primary"
+                            component={Link}
+                            to={`/view_question/${question.questionId}`}
+                          >
+                            View
+                          </Button>
+                        </TableCell>
+                        <TableCell>
+                          <Button
+                            variant="text"
+                            color="primary"
+                            component={Link}
+                            to={`/edit_question/${question.questionId}`}
+                          >
+                            Edit
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  }
+                </>
               ))
             }
           </TableBody>

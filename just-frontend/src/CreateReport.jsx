@@ -1,4 +1,4 @@
-import { Button, FormControl, InputLabel, MenuItem, Select, TextField, FormHelperText, Grid } from '@material-ui/core';
+import { Button, FormControl, InputLabel, MenuItem, Select, TextField, ListSubheader } from '@material-ui/core';
 import { createStyles, makeStyles } from '@material-ui/core/styles';
 import { Warning } from '@material-ui/icons';
 import React, { useState } from 'react';
@@ -80,18 +80,21 @@ const CreateReport = () => {
   const questionChosen = questionChosenRequest.isSuccess ? questionChosenRequest.data : null;
   const [createReport, createReportResult] = useCreateReportMutation();
   const [fieldData, setFieldData] = useState({});
-  const [title, setTitle] = useState('');
   const { data: keys } = useGetKeysQuery();
 
   if (signInStatus.data === "none") {
     return <Redirect to="/login" />
   }
 
+  const questionGroups = questionsRequest.data?.map(question => (question.topic)
+    ).sort(
+    ).filter((v, i, arr) => i === 0 || arr[i-1] !== v) ?? [];
+
   return (
     <div>
       <h1>Create Report</h1>
       <ErrorAlert apiResult={createReportResult} />
-      <FormControl variant="outlined" className={classes.formControl}>
+      {/* <FormControl variant="outlined" className={classes.formControl}>
         <TextField
           variant="outlined"
           label="Report Title"
@@ -107,7 +110,7 @@ const CreateReport = () => {
           </Grid>
         </FormHelperText>
       </FormControl>
-      <br />
+      <br /> */}
       <FormControl variant="outlined" className={classes.formControl}>
         <InputLabel htmlFor="report_type_selection">Report Type</InputLabel>
         <Select
@@ -123,10 +126,15 @@ const CreateReport = () => {
             <em>None</em>
           </MenuItem>
           {
-            questions?.map(question => (
-              <MenuItem key={question.questionId} value={question.questionId}>
-                {question.name}
-              </MenuItem>
+            questionGroups.map(group => (
+              [
+                <ListSubheader>{group}</ListSubheader>,
+                ...questions?.filter(question => question.topic === group).map(question => (
+                    <MenuItem key={question.questionId} value={question.questionId}>
+                      {question.name}
+                    </MenuItem>
+                  ))
+              ]
             ))
           }
         </Select>
@@ -157,7 +165,6 @@ const CreateReport = () => {
         onClick={() => {
           createReport({
             questionId,
-            title,
             responseContent: JSON.stringify(
               Object.keys(fieldData).map(key => ({ name: key, value: fieldData[key] }))
             ),

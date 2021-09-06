@@ -20,12 +20,14 @@ namespace JustApi.Controllers
         private readonly ProjectContext _context;
         private readonly IMapper _mapper;
         private readonly UserManager<User> _userManager;
+        private Random _random;
 
         public ReportController(ProjectContext context, IMapper mapper, UserManager<User> userManager)
         {
             _context = context;
             _mapper = mapper;
             _userManager = userManager;
+            _random = new Random(Guid.NewGuid().GetHashCode());
         }
 
         [HttpGet("{id}")]
@@ -96,15 +98,25 @@ namespace JustApi.Controllers
             return NotFound();
         }
 
+        private string GenerateReportTitle(string prefix)
+        {
+            _random = new Random(Guid.NewGuid().GetHashCode());
+            var adjectiveIndex = _random.Next(0, ReadableIDs.Adjectives.Length);
+            var animalIndex = _random.Next(0, ReadableIDs.Animals.Length);
+            var number = _random.Next(1, 101);
+            return $"{prefix}-{ReadableIDs.Adjectives[adjectiveIndex]}-{ReadableIDs.Animals[animalIndex]}-{number}";
+        }
+
         [HttpPost]
         [Authorize(Roles = "student")]
         public async Task<IActionResult> CreateReport(ReportCreationDto report)
         {
             var user = await _userManager.GetUserAsync(HttpContext.User);
             var question = await _context.Questions.AsNoTracking()
-                .Where(question => question.QuestionId == report.QuestionId).SingleOrDefaultAsync();
+                .Where(question => question.QuestionId == report.QuestionId && question.SchoolId == user.SchoolId)
+                .SingleOrDefaultAsync();
             if (question is null || question.SchoolId != user.SchoolId) return BadRequest();
-            if (string.IsNullOrWhiteSpace(report.Title)) return BadRequest();
+            
             _context.Reports.Add(new Report
             {
                 OpenedDateTime = DateTime.Now,
@@ -113,7 +125,7 @@ namespace JustApi.Controllers
                 ReportAuthorId = user.Id,
                 SchoolId = user.SchoolId,
                 ReportStatus = ReportStatus.Unresolved,
-                Title = report.Title,
+                Title = GenerateReportTitle(question.CodeName),
                 ResponseContent = report.ResponseContent,
                 StudentPublicKey = report.StudentPublicKey,
                 StudentPrivateKey = report.StudentPrivateKey,
@@ -121,6 +133,7 @@ namespace JustApi.Controllers
                 SchoolRead = false,
                 StudentRead = true,
             });
+            
             await _context.SaveChangesAsync();
             return Ok();
         }

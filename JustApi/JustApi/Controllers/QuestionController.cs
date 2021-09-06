@@ -38,7 +38,10 @@ namespace JustApi.Controllers
                 Definition = question.Definition,
                 Description = question.Description,
                 Name = question.Name,
-                SchoolId = user.SchoolId
+                SchoolId = user.SchoolId,
+                Topic = question.Topic,
+                CodeName = question.CodeName,
+                Retired = false,
             });
             await _context.SaveChangesAsync();
             return Ok();
@@ -60,11 +63,12 @@ namespace JustApi.Controllers
         public async Task<IActionResult> GetActiveShortQuestionDetails()
         {var user = await _userManager.GetUserAsync(HttpContext.User);
             var questions = await _context.Questions.AsNoTracking()
-                .Where(question => question.SchoolId == user.SchoolId)
+                .Where(question => question.SchoolId == user.SchoolId && question.Active)
                 .Select(question => new ShortQuestionDto
                 {
                     Name = question.Name,
-                    QuestionId = question.QuestionId
+                    QuestionId = question.QuestionId,
+                    Topic = question.Topic,
                 })
                 .ToListAsync();
             return Ok(questions);
@@ -76,12 +80,14 @@ namespace JustApi.Controllers
         {
             var user = await _userManager.GetUserAsync(HttpContext.User);
             var questions = await _context.Questions.AsNoTracking()
-                .Where(question => question.SchoolId == user.SchoolId)
+                .Where(question => question.SchoolId == user.SchoolId && !question.Retired)
                 .Select(question => new ShortQuestionWithActivityDto
                 {
                     Name = question.Name,
                     QuestionId = question.QuestionId,
-                    Active = question.Active
+                    Active = question.Active,
+                    Topic = question.Topic,
+                    CodeName = question.CodeName,
                 })
                 .ToListAsync();
             return Ok(questions);
@@ -93,12 +99,52 @@ namespace JustApi.Controllers
         {
             var user = await _userManager.GetUserAsync(HttpContext.User);
             var question = await _context.Questions
-                .Where(question => question.SchoolId == user.SchoolId && question.QuestionId == id)
+                .Where(question => question.SchoolId == user.SchoolId && question.QuestionId == id && !question.Retired)
                 .SingleOrDefaultAsync();
             
             if (question is null) return NotFound();
+            if (question.Retired) return BadRequest();
             
             question.Active = active;
+            await _context.SaveChangesAsync();
+            return Ok();
+        }
+
+        [HttpPut("{id}")]
+        [Authorize(Roles = "school_admin")]
+        public async Task<IActionResult> UpdateQuestion(int id, [FromBody] QuestionCreationDto question)
+        {
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            var previousQuestion = await _context.Questions
+                .Where(question => question.SchoolId == user.SchoolId && question.QuestionId == id && !question.Retired)
+                .SingleOrDefaultAsync();
+            
+            if (previousQuestion is null) return NotFound();
+            if (string.IsNullOrWhiteSpace(question.Name)) return BadRequest("Name cannot be null or whitespace");
+            if (string.IsNullOrWhiteSpace(question.CodeName))
+                return BadRequest("Code Name cannot be null or whitespace");
+            if (string.IsNullOrWhiteSpace(question.Topic))
+                return BadRequest("Topic cannot be null or whitespace.");
+            if (string.IsNullOrWhiteSpace(question.Description))
+                return BadRequest("Description cannot be null or whitespace.");
+            if (string.IsNullOrWhiteSpace(question.Definition))
+                return BadRequest("Description cannot be null or whitespace.");
+            
+            previousQuestion.Retired = true;
+            previousQuestion.Active = false;
+
+            _context.Questions.Add(new Question
+            {
+                Active = question.Active,
+                Definition = question.Definition,
+                Description = question.Description,
+                Name = question.Name,
+                SchoolId = user.SchoolId,
+                Topic = question.Topic,
+                CodeName = question.CodeName,
+                Retired = false,
+            });
+            
             await _context.SaveChangesAsync();
             return Ok();
         }

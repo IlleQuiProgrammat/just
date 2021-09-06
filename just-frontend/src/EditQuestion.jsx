@@ -1,12 +1,14 @@
 import { Button, List, ListItem, ListItemIcon, Select, TextField, MenuItem, FormControl, InputLabel, makeStyles, Paper } from '@material-ui/core';
 import { DragIndicator } from '@material-ui/icons';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { useHistory, Redirect } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import ErrorAlert from './components/ErrorAlert';
-import { useCreateQuestionMutation } from './services/questions';
+import { useEditQuestionMutation, useGetQuestionByIdQuery } from './services/questions';
 import { useGetSignInStatusQuery } from './services/auth';
+import { useParams } from 'react-router-dom';
+import { Alert } from '@material-ui/lab';
 
 const useStyles = makeStyles(theme =>
   ({
@@ -46,16 +48,30 @@ const areFieldsOk = fields => {
 const QuestionEditor = () => {
   const classes = useStyles();
   const history = useHistory();
+  const { questionId } = useParams();
   const signInStatus = useGetSignInStatusQuery();
-  const [createQuestion, createQuestionResponse] = useCreateQuestionMutation();
+  const questionResult = useGetQuestionByIdQuery(questionId);
+  const [editQuestion, editQuestionResponse] = useEditQuestionMutation();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [codeName, setCodeName] = useState('');
   const [topic, setTopic] = useState('');
   const [fields, setFields] = useState([{ type: '', title: '', name: uuidv4() }]);
 
+  useEffect(() => {
+    setName(questionResult.data?.name);
+    setDescription(questionResult.data?.description);
+    setCodeName(questionResult.data?.codeName);
+    setTopic(questionResult.data?.topic);
+    setFields(JSON.parse(questionResult.data?.definition ?? "[]"));
+  }, [questionResult])
+
   if (signInStatus.data !== "school_admin" && signInStatus.data) {
-    return <Redirect to="/login" />
+    return <Redirect to="/login" />;
+  }
+
+  if (questionResult.data?.retired) {
+    return <Redirect to="/school_settings" />;
   }
 
   const changeFieldValue = (index, property, value) => {
@@ -66,15 +82,20 @@ const QuestionEditor = () => {
 
   return (
     <>
-      <h1>Create Question</h1>
+      <h1>Edit Question</h1>
       <ErrorAlert
-        apiResult={createQuestionResponse}
-        customTitle="An unknown error occurred when creating the question."
+        apiResult={editQuestionResponse}
+        customTitle="An unknown error occurred when editing the question."
+      />
+      <ErrorAlert
+        apiResult={questionResult}
+        customTitle="An unknown error occurred when fetching the question."
       />
       <TextField
         className={classes.field}
         variant="outlined"
         label="Name"
+        value={name}
         onChange={ev => setName(ev.target.value)}
       />
       <br />
@@ -83,6 +104,7 @@ const QuestionEditor = () => {
         multiple
         variant="outlined"
         label="Description"
+        value={description}
         onChange={ev => setDescription(ev.target.value)}
       />
       <br />
@@ -90,14 +112,15 @@ const QuestionEditor = () => {
         className={classes.field}
         variant="outlined"
         label="Code Name"
+        value={codeName}
         onChange={ev => setCodeName(ev.target.value)}
       />
       <br />
       <TextField
         className={classes.field}
-        multiple
         variant="outlined"
         label="Topic"
+        value={topic}
         onChange={ev => setTopic(ev.target.value)}
       />
       <DragDropContext
@@ -168,6 +191,7 @@ const QuestionEditor = () => {
                                 multiple
                                 variant="outlined"
                                 label="Title"
+                                value={field.title}
                                 onChange={ev => changeFieldValue(index, 'title', ev.target.value)}
                               />
                               <br />
@@ -216,11 +240,12 @@ const QuestionEditor = () => {
           disabled={
             isEmptyOrWhitespace(name)
             || isEmptyOrWhitespace(description)
-            || isEmptyOrWhitespace(codeName)
             || isEmptyOrWhitespace(topic)
+            || isEmptyOrWhitespace(codeName)
             || !areFieldsOk(fields)}
           onClick={() => {
-            createQuestion({
+            editQuestion({
+              questionId,
               name,
               description,
               codeName,
@@ -232,7 +257,7 @@ const QuestionEditor = () => {
             })
           }}
         >
-          Create
+          Save
         </Button>
       </div>
     </>

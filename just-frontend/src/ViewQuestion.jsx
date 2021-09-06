@@ -89,7 +89,7 @@ const ViewQuestion = () => {
       }
       <p>{question?.description}</p>
 
-      {
+      {/* {
         question
           ? <FormControl variant="outlined" className={classes.formControl}>
             <TextField
@@ -98,7 +98,7 @@ const ViewQuestion = () => {
             />
           </FormControl>
           : null
-      }
+      } */}
       <br />
       {
         JSON.parse(question?.definition ?? "null")?.map(question => (
