@@ -106,7 +106,11 @@ const Register = ({ history }) => {
         onClick={() => {
           register({ email, password, tsAndCs })
         }}
-        disabled={passwordResult.score < 3 || !tsAndCs || email === ''}
+        disabled={
+          passwordResult.score < 3
+          || !tsAndCs
+          || email === ''
+          || passwordConfirmation !== password}
       >
         Register
       </Button>
