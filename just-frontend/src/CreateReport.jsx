@@ -1,6 +1,5 @@
 import { Button, FormControl, InputLabel, MenuItem, Select, TextField, ListSubheader } from '@material-ui/core';
 import { createStyles, makeStyles } from '@material-ui/core/styles';
-import { Warning } from '@material-ui/icons';
 import React, { useState } from 'react';
 import { useHistory, Redirect } from 'react-router-dom';
 import { useGetActiveShortFormsQuery, useGetFormByIdQuery } from './services/forms';
