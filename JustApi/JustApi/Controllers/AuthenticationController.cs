@@ -72,7 +72,7 @@ namespace JustApi.Controllers
                 return BadRequest(new[] {new {Code = "TsAndCs", Description = "Terms and Conditions not accepted"}});
             }
 
-            var domain = registrationForm.Email.Split('@').Last();
+            var domain = registrationForm.Email.Split('@').Last().ToLower();
             var school = await _context.Schools.Where(school => school.EmailDomain == domain).SingleOrDefaultAsync();
             if (school is null)
             {

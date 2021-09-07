@@ -73,7 +73,7 @@ namespace JustApi.Controllers
                 return BadRequest(new[] {new {Code = "TsAndCs", Description = "Terms and Conditions not accepted"}});
             }
 
-            var domain = schoolStart.Email.Split('@').Last();
+            var domain = schoolStart.Email.Split('@').Last().ToLower();
             if (domain != school.EmailDomain)
             {
                 return BadRequest(new[] {new {Code = "EmailDomain", Description = "Domain must match school domain"}});
@@ -129,7 +129,7 @@ namespace JustApi.Controllers
             var potentialSchool = new School
             {
                 CreationDateTime = DateTime.Now,
-                EmailDomain = school.EmailDomain,
+                EmailDomain = school.EmailDomain.ToLower(),
                 Name = school.Name,
                 Secret = encodedSecret,
                 StudentLimit = school.StudentLimit,
