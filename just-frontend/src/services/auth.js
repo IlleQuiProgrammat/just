@@ -92,17 +92,6 @@ export const authApi = createApi({
         window.crypto.getRandomValues(iv);
         let privateKeyEncrypted = await encryptSymmetric(privateKeyPlain, userPassword, iv);
         let passExport = await window.crypto.subtle.exportKey("raw", serverPassword);
-        let potentialSchoolKeyPair = await generateKeypair();
-        let potentialSchoolPublic = await window.crypto.subtle.exportKey("spki", potentialSchoolKeyPair.publicKey);
-        let potentialSchoolPrivateKeyExported = await window.crypto.subtle.exportKey("pkcs8", potentialSchoolKeyPair.privateKey);
-        let schoolIV = new Uint8Array(8);
-        window.crypto.getRandomValues(schoolIV);
-        let potentialSchoolPrivateKeyEncrypted = await encryptAsymmetric(
-          potentialSchoolPrivateKeyExported,
-          keyPair.privateKey, 
-          potentialSchoolKeyPair.publicKey,
-          schoolIV
-        );
         return baseQuery({
           url: 'auth/register',
           method: 'POST',
@@ -113,9 +102,6 @@ export const authApi = createApi({
             email, 
             tsAndCs, 
             password: base64EncArr(passExport),
-            potentialSchoolPublicKey: base64EncArr(potentialSchoolPublic),
-            potentialSchoolPrivateKey: base64EncArr(potentialSchoolPrivateKeyEncrypted),
-            potentialSchoolPrivateKeyIV: base64EncArr(schoolIV)
           }
         })
       }

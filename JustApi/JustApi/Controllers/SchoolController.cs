@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -12,7 +13,6 @@ namespace JustApi.Controllers
 {
     [ApiController]
     [Route("/schools/")]
-    [Authorize]
     public class SchoolController : ControllerBase
     {
         private readonly ProjectContext _context;
@@ -25,6 +25,7 @@ namespace JustApi.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> GetSchoolSettings()
         {
             var currentUser = await _userManager.GetUserAsync(HttpContext.User);
@@ -39,6 +40,103 @@ namespace JustApi.Controllers
                     })
                     .SingleOrDefaultAsync()
             );
+        }
+
+        [HttpGet("{secret}")]
+        public async Task<IActionResult> GetSchoolSettingsBySecret(string secret)
+        {
+            if (string.IsNullOrWhiteSpace(secret)) return BadRequest();
+            return Ok(
+                await _context.Schools.AsNoTracking()
+                    .Where(school => school.Secret == secret)
+                    .Select(school => new SchoolSettingsDto
+                    {
+                        SchoolId = school.SchoolId,
+                        Name = school.Name,
+                        EmailDomain = school.EmailDomain,
+                    })
+                    .SingleOrDefaultAsync()
+            );
+        }
+
+        [HttpPost("{secret}")]
+        public async Task<IActionResult> RegisterSchoolWithSecret(string secret, [FromBody] SchoolStartDto schoolStart)
+        {
+            if (string.IsNullOrWhiteSpace(secret)) return BadRequest();
+            var school = await _context.Schools
+                .Where(school => school.Secret == secret)
+                .SingleOrDefaultAsync();
+            if (school is null) return NotFound();
+            
+            if (!schoolStart.TsAndCs)
+            {
+                return BadRequest(new[] {new {Code = "TsAndCs", Description = "Terms and Conditions not accepted"}});
+            }
+
+            var domain = schoolStart.Email.Split('@').Last();
+            if (domain != school.EmailDomain)
+            {
+                return BadRequest(new[] {new {Code = "EmailDomain", Description = "Domain must match school domain"}});
+            }
+
+            var schoolCount = await _context.Schools.CountAsync();
+            
+            User potentialUser = new User()
+            {
+                UserName = schoolStart.Email,
+                Email = schoolStart.Email,
+                // TODO: Enable email verification
+                EmailConfirmed = true,
+                SchoolId = school.SchoolId,
+                Role = schoolCount == 1 ? DenormalisedRole.Admin : DenormalisedRole.SchoolAdmin,
+                PublicKey = schoolStart.PublicKey,
+                PrivateKey = schoolStart.PrivateKey,
+                SchoolPrivateKey = schoolStart.SchoolPrivateKey,
+                IV = schoolStart.IV,
+                SchoolPrivateKeyIV = schoolStart.SchoolPrivateKeyIV,
+            };
+            
+            var result = await _userManager.CreateAsync(potentialUser, schoolStart.Password);
+            if (result.Succeeded)
+            {
+                if (schoolCount == 1)
+                {
+                    await _userManager.AddToRoleAsync(potentialUser, "admin");
+                }
+                else
+                {
+                    await _userManager.AddToRoleAsync(potentialUser, "school_admin");
+                }
+                school.Secret = null;
+                school.PublicKey = schoolStart.SchoolPublicKey;
+                await _context.SaveChangesAsync();
+                return Ok();
+            }
+            
+            return BadRequest(result.Errors);
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "admin")]
+        public async Task<IActionResult> CreateSchool(SchoolCreationDto school)
+        {
+            using var rng = RandomNumberGenerator.Create();
+            var secret = new byte[64];
+            rng.GetBytes(secret);
+            var encodedSecret = Convert.ToBase64String(secret)
+                .Replace('+', '_')
+                .Replace('/', '-');
+            var potentialSchool = new School
+            {
+                CreationDateTime = DateTime.Now,
+                EmailDomain = school.EmailDomain,
+                Name = school.Name,
+                Secret = encodedSecret,
+                StudentLimit = school.StudentLimit,
+            };
+            _context.Schools.Add(potentialSchool);
+            await _context.SaveChangesAsync();
+            return Ok(encodedSecret);
         }
 
         [HttpGet("users")]

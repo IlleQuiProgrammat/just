@@ -1,7 +1,7 @@
 import { makeStyles, createStyles, TextField, Button } from '@material-ui/core';
 import { useDispatch } from 'react-redux';
 import React, { useState } from 'react';
-import { Redirect } from 'react-router-dom/cjs/react-router-dom.min';
+import { Redirect } from 'react-router-dom';
 import { useGetSignInStatusQuery, useLoginMutation } from './services/auth';
 import { signin } from './features/users/userSlice';
 import ErrorAlert from './components/ErrorAlert';

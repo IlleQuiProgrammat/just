@@ -93,27 +93,18 @@ namespace JustApi
             
             if (userManager.GetUsersInRoleAsync("admin").Result.Count == 0)
             {
-                Console.WriteLine("Creating admin user with username `admin'.");
+                Console.WriteLine("Creating admin school.");
                 var school = new School
                 {
                     Name = "Admin School",
-                    EmailDomain = "localhost",
+                    EmailDomain = Configuration["AdminSchoolDomain"],
+                    Secret = Configuration["AdminSchoolSecret"],
                     CreationDateTime = DateTime.Now,
                     StudentLimit = 1,
                 };
                 context.Schools.Add(school);
                 context.SaveChangesAsync().Wait();
-                var adminUser = new User
-                {
-                    UserName = "admin",
-                    Email = "admin@localhost",
-                    EmailConfirmed = true,
-                    SchoolId = school.SchoolId,
-                    Role = DenormalisedRole.Admin
-                };
-                userManager.CreateAsync(adminUser, Configuration["DefaultAdminPassword"]).Wait();
-                userManager.AddToRoleAsync(adminUser, "admin").Wait();
-                Console.WriteLine("Created admin user.");
+                Console.WriteLine("Created admin school.");
             }
         }
     }

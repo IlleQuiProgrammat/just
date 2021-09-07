@@ -21,6 +21,8 @@ import Register from './Register';
 import Header from './components/Header';
 import MyReportList from './MyReportList';
 import ViewForm from './ViewForm';
+import CreateSchool from './CreateSchool';
+import StartSchool from './StartSchool';
 
 export default function ScrollToTop() {
   const { pathname } = useLocation();
@@ -70,6 +72,12 @@ ReactDOM.render(
               </Route>
               <Route path="/register">
                 <Register />
+              </Route>
+              <Route path="/create_school">
+                <CreateSchool />
+              </Route>
+              <Route path="/start_school/:schoolSecret">
+                <StartSchool />
               </Route>
               <Route exact path={["/home", "/"]}>
                 <Home />

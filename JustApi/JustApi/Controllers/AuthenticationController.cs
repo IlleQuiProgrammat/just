@@ -86,8 +86,6 @@ namespace JustApi.Controllers
                 });
             }
 
-            var userCnt = await _context.Users.CountAsync(x => x.SchoolId == school.SchoolId);
-            
             User potentialUser = new User()
             {
                 UserName = registrationForm.Email,
@@ -102,27 +100,11 @@ namespace JustApi.Controllers
                 IV = registrationForm.IV,
                 SchoolPrivateKeyIV = "",
             };
-
-            if (userCnt == 0)
-            {
-                potentialUser.SchoolPrivateKey = registrationForm.PotentialSchoolPrivateKey;
-                potentialUser.SchoolPrivateKeyIV = registrationForm.PotentialSchoolPrivateKeyIV;
-                potentialUser.Role = DenormalisedRole.SchoolAdmin;
-            }
             
             var result = await _userManager.CreateAsync(potentialUser, registrationForm.Password);
             if (result.Succeeded)
             {
-                if (userCnt == 0)
-                {
-                    school.PublicKey = registrationForm.PotentialSchoolPublicKey;
-                    await _context.SaveChangesAsync();
-                    await _userManager.AddToRoleAsync(potentialUser, "school_admin");
-                }
-                else
-                {
-                    await _userManager.AddToRoleAsync(potentialUser, "student");
-                }
+                await _userManager.AddToRoleAsync(potentialUser, "student");
                 return Ok();
             }
             

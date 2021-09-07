@@ -12,6 +12,7 @@ namespace JustApi.Models
         public DateTime CreationDateTime { get; set; }
         public int StudentLimit { get; set; }
         public string PublicKey { get; set; }
+        public string Secret { get; set; }
         [JsonIgnore]
         public virtual List<User> Members { get; set; }
         [JsonIgnore]
