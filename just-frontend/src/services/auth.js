@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { encryptSymmetric, generateKeypair, getServerPassword, base64EncArr, base64DecToArr, importEncodedPublicKey, getSymmetricEncryptionKey, importEncEncPrivateKey, decryptAsymmetric, importPrivateKeyBytes, getCachedSymmetricEncryptionKey, encryptAsymmetric } from '../utils';
+import { encryptSymmetric, generateKeypair, getServerPassword, base64EncArr, base64DecToArr, importEncodedPublicKey, getSymmetricEncryptionKey, importEncEncPrivateKey, decryptAsymmetric, importPrivateKeyBytes, getCachedSymmetricEncryptionKey } from '../utils';
 
 export const authApi = createApi({
   reducerPath: 'authApi',

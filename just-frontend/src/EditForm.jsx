@@ -8,7 +8,6 @@ import ErrorAlert from './components/ErrorAlert';
 import { useEditFormMutation, useGetFormByIdQuery } from './services/forms';
 import { useGetSignInStatusQuery } from './services/auth';
 import { useParams } from 'react-router-dom';
-import { Alert } from '@material-ui/lab';
 
 const useStyles = makeStyles(theme =>
   ({
