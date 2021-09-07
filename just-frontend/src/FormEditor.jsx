@@ -67,6 +67,7 @@ const FormEditor = () => {
   return (
     <>
       <h1>Create Form</h1>
+      <p><em>All fields are required</em></p>
       <ErrorAlert
         apiResult={createFormResponse}
         customTitle="An unknown error occurred when creating the form."
@@ -90,6 +91,7 @@ const FormEditor = () => {
         className={classes.field}
         variant="outlined"
         label="Code Name"
+        helperText="This is prepended to report titles to make issue identification easier."
         onChange={ev => setCodeName(ev.target.value)}
       />
       <br />
@@ -97,7 +99,7 @@ const FormEditor = () => {
         className={classes.field}
         multiple
         variant="outlined"
-        label="Topic"
+        label="Parent Topic"
         onChange={ev => setTopic(ev.target.value)}
       />
       <DragDropContext

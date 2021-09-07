@@ -29,6 +29,7 @@ const StartSchool = () => {
   
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [passwordConfirmation, setPasswordConfirmation] = useState('');
   const [passwordResult, setPasswordResult] = useState({ score: 0 });
   const [tsAndCs, setTsAndCs] = useState(false);
 
@@ -65,7 +66,7 @@ const StartSchool = () => {
       <br />
       <TextField
         className={classes.input}
-        label="Email"
+        label="School Email"
         variant="outlined"
         name="email"
         onChange={ev => setEmail(ev.target.value)}
@@ -97,6 +98,17 @@ const StartSchool = () => {
         ) : undefined}
       />
       <br />
+      <TextField
+        className={classes.input}
+        label="Confirm Password"
+        variant="outlined"
+        name="password_confirmation"
+        type="password"
+        onChange={ev => setPasswordConfirmation(ev.target.value)}
+        error={password !== passwordConfirmation}
+        helperText={password !== passwordConfirmation ? 'Passwords do not match' : undefined}
+      />
+      <br />
       <Checkbox
         label="I agree to the terms and conditions"
         color="primary"
@@ -123,7 +135,12 @@ const StartSchool = () => {
             tsAndCs,
           })
         }}
-        disabled={passwordResult.score < 3 || !tsAndCs || email === ''}
+        disabled={
+          passwordResult.score < 3
+          || !tsAndCs
+          || email === ''
+          || password !== passwordConfirmation
+        }
       >
         Start School
       </Button>

@@ -37,7 +37,7 @@ const Login = () => {
       <ErrorAlert apiResult={loginResult} customTitle="Could not sign in with the given credentials." />
       <TextField
         className={classes.input}
-        label="Email" variant="outlined"
+        label="School Email" variant="outlined"
         name="email"
         onChange={(ev) => setEmail(ev.target.value)}
       />

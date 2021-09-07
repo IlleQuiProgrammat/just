@@ -102,6 +102,7 @@ namespace JustApi.Controllers
                 if (schoolCount == 1)
                 {
                     await _userManager.AddToRoleAsync(potentialUser, "admin");
+                    school.EmailDomain = "@"; // prevents sign ups
                 }
                 else
                 {

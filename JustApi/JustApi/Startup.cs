@@ -91,7 +91,7 @@ namespace JustApi
                 if (!(roleManager.RoleExistsAsync(role).Result)) roleManager.CreateAsync(new Role(role)).Wait();
             }
             
-            if (userManager.GetUsersInRoleAsync("admin").Result.Count == 0)
+            if (context.Schools.CountAsync().Result == 0)
             {
                 Console.WriteLine("Creating admin school.");
                 var school = new School
