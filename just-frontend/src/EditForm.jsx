@@ -202,6 +202,7 @@ const FormEditor = () => {
                                   multiple
                                   variant="outlined"
                                   label="Options (Comma-Separated)"
+                                  value={field.options?.join(',')}
                                   onChange={ev => changeFieldValue(index, 'options', ev.target.value.split(','))}
                                 /> : null
                               }
