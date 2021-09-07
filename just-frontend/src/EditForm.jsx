@@ -111,6 +111,7 @@ const FormEditor = () => {
         className={classes.field}
         variant="outlined"
         label="Code Name"
+        helperText="This is prepended to report titles to make issue identification easier."
         value={codeName}
         onChange={ev => setCodeName(ev.target.value)}
       />
@@ -118,7 +119,7 @@ const FormEditor = () => {
       <TextField
         className={classes.field}
         variant="outlined"
-        label="Topic"
+        label="Parent Topic"
         value={topic}
         onChange={ev => setTopic(ev.target.value)}
       />

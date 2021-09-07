@@ -23,6 +23,7 @@ const Register = ({ history }) => {
   const [email, setEmail] = useState('');
   const signInStatus = useGetSignInStatusQuery();
   const [password, setPassword] = useState('');
+  const [passwordConfirmation, setPasswordConfirmation] = useState('');
   const [passwordResult, setPasswordResult] = useState({ score: 0 });
   const [tsAndCs, setTsAndCs] = useState(false);
   const [register, registerResult] = useRegisterMutation();
@@ -41,7 +42,7 @@ const Register = ({ history }) => {
       <ErrorAlert apiResult={registerResult} extractErrors={errors => errors?.map(code => code.description)} />
       <TextField
         className={classes.input}
-        label="Email"
+        label="School Email"
         variant="outlined"
         name="email"
         onChange={ev => setEmail(ev.target.value)}
@@ -71,6 +72,17 @@ const Register = ({ history }) => {
             </ul>
           </div>
         ) : undefined}
+      />
+      <br />
+      <TextField
+        className={classes.input}
+        label="Confirm Password"
+        variant="outlined"
+        name="password_confirmation"
+        type="password"
+        onChange={ev => setPasswordConfirmation(ev.target.value)}
+        error={password !== passwordConfirmation}
+        helperText={password !== passwordConfirmation ? 'Passwords do not match' : undefined}
       />
       <br />
       <Checkbox
